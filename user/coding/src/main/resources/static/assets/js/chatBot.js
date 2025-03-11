@@ -1,4 +1,4 @@
-const webSocket = new WebSocket("ws://118.217.203.50:8764");
+const webSocket = new WebSocket("ws://localhost:8764");
 
 webSocket.onmessage = async (event) => {
   anser = event.data;

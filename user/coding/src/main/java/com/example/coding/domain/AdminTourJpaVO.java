@@ -19,13 +19,13 @@ public class AdminTourJpaVO {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "tour_num")
-    private String tourNum;        // 여행지 번호 
+    private Integer tourNum;        // 여행지 번호 
 
     @Column(name = "inquiry_num")
     private Integer inquiryNum ;   // 여행지 전화 번호 
 
     @Column(name = "loc_cate_code")
-    private String locCateCode ;  // 여행지 별점
+    private Integer locCateCode ;  // 여행지 별점
 
     @Column(name = "tour_cate_code")
     private String tourCateCode;  // 여행지 코드

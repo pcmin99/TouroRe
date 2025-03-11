@@ -8,9 +8,9 @@
   <!-- 유저별 선호 지역 가져오기 - 3개 - ajax -->
   <select id="preferLoc" parameterType="UserVO" resultType="MainVO">
     SELECT
-      loc1.loc_cate_name AS user_prefer_loc1,
-      loc2.loc_cate_name AS user_prefer_loc2,
-      loc3.loc_cate_name AS user_prefer_loc3
+      loc1.loc_name AS user_prefer_loc1,
+      loc2.loc_name AS user_prefer_loc2,
+      loc3.loc_name AS user_prefer_loc3
     FROM
       USER u
       JOIN loc_cate loc1 ON u.user_prefer_loc1 = loc1.loc_cate_code
@@ -49,7 +49,7 @@
 
   <!-- 유저 선호 지역 이름 가져오기 -->
   <select id="getUserInfoLoc" parameterType="MainVO" resultType="MainVO">
-    SELECT l.loc_cate_name user_prefer_loc1_name
+    SELECT l.loc_name user_prefer_loc1_name
     FROM loc_cate l, user u
     WHERE u.user_id = #{user_id} AND loc_cate_code = u.user_prefer_loc1
 
@@ -173,21 +173,21 @@
       SELECT
         user_id,
         user_prefer_loc1 AS locCode,
-        l.loc_cate_name AS locName
+        l.loc_name AS locName
       FROM USER u, loc_cate l
       WHERE u.user_prefer_loc1 = l.loc_cate_code
       UNION ALL
       SELECT
         user_id,
         user_prefer_loc2,
-        l.loc_cate_name
+        l.loc_name
       FROM USER u, loc_cate l
       WHERE u.user_prefer_loc2 = l.loc_cate_code
       UNION ALL
       SELECT
         user_id,
         user_prefer_loc3,
-        l.loc_cate_name
+        l.loc_name
       FROM USER u, loc_cate l
       WHERE u.user_prefer_loc3 = l.loc_cate_code
     ) AS unpivoted_data
@@ -198,21 +198,21 @@
         SELECT
           user_id,
           user_prefer_loc1 AS locCode,
-          l.loc_cate_name AS locName
+          l.loc_name AS locName
         FROM USER u, loc_cate l
         WHERE u.user_prefer_loc1 = l.loc_cate_code
         UNION ALL
         SELECT
           user_id,
           user_prefer_loc2,
-          l.loc_cate_name
+          l.loc_name
         FROM USER u, loc_cate l
         WHERE u.user_prefer_loc2 = l.loc_cate_code
         UNION ALL
         SELECT
           user_id,
           user_prefer_loc3,
-          l.loc_cate_name
+          l.loc_name
         FROM USER u, loc_cate l
         WHERE u.user_prefer_loc3 = l.loc_cate_code
       ) AS totalCountQuery
