@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.coding.dao.MainDAO">
+
+
+  <!-- 유저별 선호 지역 가져오기 - 3개 - ajax -->
+  <select id="preferLoc" parameterType="UserVO" resultType="MainVO">
+    SELECT
+      loc1.loc_cate_name AS user_prefer_loc1,
+      loc2.loc_cate_name AS user_prefer_loc2,
+      loc3.loc_cate_name AS user_prefer_loc3
+    FROM
+      USER u
+      JOIN loc_cate loc1 ON u.user_prefer_loc1 = loc1.loc_cate_code
+      JOIN loc_cate loc2 ON u.user_prefer_loc2 = loc2.loc_cate_code
+      JOIN loc_cate loc3 ON u.user_prefer_loc3 = loc3.loc_cate_code
+    WHERE
+      u.user_id = #{user_id}
+
+  </select>
+
+
+  <!-- 유저 선호 지역으로 사계절 갈 만한 곳 보여주기 -->
+  <select id="seasonRecommand" parameterType="com.example.coding.domain.UserVO" resultType="com.example.coding.domain.MainVO">
+    SELECT DISTINCT t.tour_name tour_name, t.tour_addr tour_addr
+    , t.tour_star tour_star, t.tour_content tour_content, t.tour_img1_path tour_img1_path
+    , t.tour_cate_code tour_cate_code, t.tour_num tour_num
+    FROM tour t
+    JOIN USER u ON (t.tour_cate_name = u.user_prefer_type1 OR t.tour_cate_name = u.user_prefer_type2 OR t.tour_cate_name = u.user_prefer_type3)
+    JOIN seasonTable s ON t.loc_cate_code = s.loc_cate_code
+    WHERE u.user_id = #{user_id} AND s.season = 1
+    AND (t.loc_cate_code = u.user_prefer_loc1 OR t.loc_cate_code = u.user_prefer_loc2 OR t.loc_cate_code = u.user_prefer_loc3)
+    ORDER BY t.tour_cate_code, t.tour_star DESC
+    LIMIT 4;
+
+  </select>
+
+  <!-- 메인 유저 선호 1/2/3순위 여행지 타입에 대한 여행지 추천 -->
+  <select id="getReco" parameterType="com.example.coding.domain.Reco1VO" resultType="com.example.coding.domain.TourVO">
+    SELECT tour_num, tour_name, tour_addr, tour_img1_path, tour_img2_path, loc_cate_code
+    FROM tour
+    WHERE tour_num = #{tour_num1} OR tour_num = #{tour_num2} OR tour_num = #{tour_num3} 
+    OR tour_num = #{tour_num4} OR tour_num = #{tour_num5} OR tour_num = #{tour_num6} 
+    OR tour_num = #{tour_num7} OR tour_num = #{tour_num8} OR tour_num = #{tour_num9}
+  </select>
+
+
+  <!-- 유저 선호 지역 이름 가져오기 -->
+  <select id="getUserInfoLoc" parameterType="MainVO" resultType="MainVO">
+    SELECT l.loc_cate_name user_prefer_loc1_name
+    FROM loc_cate l, user u
+    WHERE u.user_id = #{user_id} AND loc_cate_code = u.user_prefer_loc1
+
+  </select>
+
+  <!-- 유저 선호 타입 이름 가져오기 -->
+  <select id="getUserInfo" parameterType="MainVO" resultType="MainVO">
+    SELECT user_prefer_type1 tour_cate_code_name
+    FROM user
+    WHERE user_id = #{user_id}
+  </select>
+
+  <!-- 메인 유저 선호 1순위 지역에 대한 1/2/3순위 여행지 추천 -->
+  <select id="getRecoType" parameterType="Reco1VO" resultType="TourVO">
+    SELECT tour_num, tour_name, tour_addr, tour_img1_path, tour_img2_path, loc_cate_code
+    FROM tour
+    WHERE tour_num = #{tour_num1} OR tour_num = #{tour_num2} OR tour_num = #{tour_num3} 
+    OR tour_num = #{tour_num4} OR tour_num = #{tour_num5} OR tour_num = #{tour_num6} 
+    OR tour_num = #{tour_num7} OR tour_num = #{tour_num8} OR tour_num = #{tour_num9}
+  </select>
+
+  <!-- 후기 게시글의 긍정 부정 판단으로 사용자 선호 지역 중에 여행지 추천 -->
+  <select id="yesResult" parameterType="Reco1VO" resultType="TourVO">
+    SELECT tour_num, tour_name, tour_addr, tour_img1_path, tour_img2_path, loc_cate_code
+    FROM tour
+    WHERE tour_num = #{tour_num1} OR tour_num = #{tour_num2} OR tour_num = #{tour_num3} 
+    OR tour_num = #{tour_num4}
+  </select>
+
+  <!-- 베스트 리뷰어 -->
+  <select id="bestReviewer" resultType="MainVO">
+    SELECT
+      touroview.user_id AS user_id,
+      AVG(touroview_review.touroview_review_star) AS average_rating,
+      COUNT(touroview_review.touroview_review_star) AS comment_count
+    FROM
+      touroview
+      JOIN touroview_review ON touroview.touroview_num = touroview_review.touroview_num
+    GROUP BY
+      touroview.user_id
+    ORDER BY
+      comment_count DESC, average_rating DESC
+    LIMIT 4;
+  </select>
+
+  <!-- 관리자 여행 찾기 게시판 리스트-->
+	<select  id="touromateList" parameterType="AdminTouroMateVO" resultType="AdminTouroMateVO">
+		SELECT distinct tm.user_id user_id, 
+    tm.touro_mate_title touro_mate_title, 
+    tm.touro_mate_content touro_mate_content,
+    li.like_count like_count, 
+    tm.touro_mate_date touro_mate_date
+    ,tm.touro_mate_num touro_mate_num
+    FROM 	touro_mate tm
+    LEFT  JOIN `like` li ON li.touro_mate_num = tm.touro_mate_num
+	</select>
+
+   <!-- 관리자 touromate 검색-->
+	<select  id="searchMate" parameterType="AdminTouroMateVO" resultType="AdminTouroMateVO">
+		SELECT tm.user_id user_id, 
+    tm.touro_mate_title touro_mate_title, 
+    tm.touro_mate_content touro_mate_content,
+    li.like_count like_count, 
+    tm.touro_mate_date touro_mate_date
+    ,tm.touro_mate_num touro_mate_num
+    FROM 	touro_mate tm
+    LEFT  JOIN `like` li ON li.touro_mate_num = tm.touro_mate_num
+    WHERE tm.user_id LIKE CONCAT('%', #{user_id}, '%')
+    OR tm.touro_mate_title LIKE CONCAT('%', #{touro_mate_title}, '%')
+    OR tm.touro_mate_content LIKE CONCAT('%', #{touro_mate_content}, '%')
+	</select>
+
+  <!-- 관리자 여행찾기 상세 디테일 -->
+  <select id="touroMateNum" parameterType="Integer" resultType="AdminVO">
+    SELECT * FROM touro_mate tm
+		LEFT OUTER JOIN img_detail id ON id.touro_mate_num = tm.touro_mate_num
+		LEFT OUTER JOIN img ig ON ig.img_num = id.img_num
+		WHERE tm.touro_mate_num = #{touro_mate_num}
+  </select>
+
+  <!-- 관리자 대시보드 - 회원수 가져오기 -->
+  <select id="userCount" resultType="Integer">
+    SELECT count(*) FROM USER;
+  </select>
+
+  <!-- 관리자 대시보드 - 여행친구찾기 게시글 수 가져오기 -->
+  <select id="touroviewCount" resultType="Integer">
+    SELECT count(*) FROM touro_mate;
+  </select>
+
+  <!-- 관리자 대시보드 - 후기 게시글 수 가져오기 -->
+  <select id="reviewCount" resultType="Integer">
+    SELECT count(*) FROM touroview;
+  </select>
+
+  <!-- 관리자 대시보드 - 영수증 리뷰 수 가져오기 -->
+  <select id="receiptReviewCount" resultType="Integer">
+    SELECT count(*) FROM receipt;
+  </select>
+
+  <!-- 관리자 대시보드 - 연령대 별 회원 수 통계 -->
+  <select id="getAgeUser" resultType="AdminVO">
+    SELECT
+      SUM(CASE WHEN USER.user_age BETWEEN 0 AND 19 THEN 1 ELSE 0 END) as age_0_19,
+      SUM(CASE WHEN USER.user_age BETWEEN 20 AND 30 THEN 1 ELSE 0 END) as age_20_30,
+      SUM(CASE WHEN USER.user_age BETWEEN 31 AND 40 THEN 1 ELSE 0 END) as age_31_40,
+      SUM(CASE WHEN USER.user_age BETWEEN 41 AND 50 THEN 1 ELSE 0 END) as age_41_50,
+      SUM(CASE WHEN USER.user_age BETWEEN 51 AND 60 THEN 1 ELSE 0 END) as age_51_60,
+      SUM(CASE WHEN USER.user_age <![CDATA[>=]]> 61 THEN 1 ELSE 0 END) as age_61_and_above
+    FROM user;
+  </select>
+
+  <!-- 관리자 대시보드 - 우리나라 지도 : 선호도 순위 4개 통계 -->
+  <select id="locPrefer" resultType="MainAdminVO"> 
+    SELECT
+      locCode,
+      COUNT(*) AS locCount,
+      locName,
+      totalCount
+    FROM (
+      SELECT
+        user_id,
+        user_prefer_loc1 AS locCode,
+        l.loc_cate_name AS locName
+      FROM USER u, loc_cate l
+      WHERE u.user_prefer_loc1 = l.loc_cate_code
+      UNION ALL
+      SELECT
+        user_id,
+        user_prefer_loc2,
+        l.loc_cate_name
+      FROM USER u, loc_cate l
+      WHERE u.user_prefer_loc2 = l.loc_cate_code
+      UNION ALL
+      SELECT
+        user_id,
+        user_prefer_loc3,
+        l.loc_cate_name
+      FROM USER u, loc_cate l
+      WHERE u.user_prefer_loc3 = l.loc_cate_code
+    ) AS unpivoted_data
+    JOIN (
+      SELECT
+        COUNT(*) AS totalCount
+      FROM (
+        SELECT
+          user_id,
+          user_prefer_loc1 AS locCode,
+          l.loc_cate_name AS locName
+        FROM USER u, loc_cate l
+        WHERE u.user_prefer_loc1 = l.loc_cate_code
+        UNION ALL
+        SELECT
+          user_id,
+          user_prefer_loc2,
+          l.loc_cate_name
+        FROM USER u, loc_cate l
+        WHERE u.user_prefer_loc2 = l.loc_cate_code
+        UNION ALL
+        SELECT
+          user_id,
+          user_prefer_loc3,
+          l.loc_cate_name
+        FROM USER u, loc_cate l
+        WHERE u.user_prefer_loc3 = l.loc_cate_code
+      ) AS totalCountQuery
+    ) AS totalData ON 1=1
+    GROUP BY locCode, locName, totalCount
+    ORDER BY locCount DESC
+    LIMIT 4;
+  </select>
+
+  <!-- 관리자 후기 게시판 신고 3번 이상 찾기 -->
+  <select id="touroviewBlindCount" parameterType="Integer" resultType="Integer">
+    SELECT count(*)
+    FROM report
+    WHERE touroview_num = #{tourview_num}
+
+  </select>
+
+  <!-- 관리자 후기 게시판 신고 3번 이상 게시글 블라인드 처리 -->
+  <update id="touroviewBlind" parameterType="TouroviewVO">
+    UPDATE touroview SET touroview_title = '블라인드 처리된 글입니다.'
+    , touroview_content = '블라인드 처리된 글입니다.'
+    WHERE touroview_num = #{touroview_num}
+  </update>
+
+  <!-- 관리자 문의 답변 보내기 - DB 저장 -->
+  <insert id="inquiryReview" parameterType="AdminVO">
+    INSERT INTO inquiry_review(inquiry_review_content,inquiry_num) VALUES(#{inquiry_review_content},#{inquiry_num})
+  </insert>
+
+  <!-- 관리자 문의 답변하면 -> inquiry_process = 1로 변경 -->
+  <update id="inquiryProcess" parameterType="AdminVO">
+    UPDATE inquiry SET inquiry_process = 1 WHERE inquiry_num = #{inquiry_num}
+  </update>
+
+  <!-- 관리자 문의 답변 보내기 - DB 수정 -->
+  <update id="inquiryReviewUpdate" parameterType="AdminVO">
+    UPDATE inquiry_review SET inquiry_review_content = #{inquiry_review_content} WHERE inquiry_num = #{inquiry_num}
+  </update>
+
+
+  <!-- 관리자 대시보드 - 인기 게시물 가져오기 -->
+  <select id="popularPost" resultType="AdminVO">
+    SELECT tv.touroview_num, t.tour_name, tv.user_id, SUM(li.like_count) as like_count
+    FROM touroview tv
+    INNER JOIN tour t ON tv.tour_num = t.tour_num
+    LEFT JOIN `like` li ON tv.touroview_num = li.touroview_num
+    LEFT JOIN report r ON tv.touroview_num = r.touroview_num
+    WHERE r.report_count = 0 OR r.report_count IS NULL AND like_count <![CDATA[>]]> 0
+    GROUP BY tv.touroview_num, t.tour_name, tv.user_id
+    ORDER BY like_count DESC; 
+  </select>
+
+  <!-- 관리자 대시보드 - 인기 여행지 가져오기 -->
+  <select id="popularTour" resultType="AdminVO">
+    SELECT t.tour_num tour_num, count(wl.tour_num) wish_count, t.tour_img1_path tour_img1_path, t.tour_name tour_name, t.tour_cate_name tour_cate_name
+    FROM wishlist wl INNER JOIN tour t ON wl.tour_num = t.tour_num
+    GROUP BY wl.tour_num 
+    ORDER BY wish_count DESC
+    LIMIT 5;
+  </select>
+
+  <!-- 관리자 대시보드 - 회원수 차트 값... -->
+  <select id="usercountGraph" resultType="ChartVO">
+    SELECT DATE_FORMAT(user_register_date, '%y.%m') AS month,
+	    Count(DATE_FORMAT(user_register_date, '%y.%m')) AS count_month
+    FROM USER
+    WHERE user_register_date &gt; CURDATE() - INTERVAL 6 month
+    GROUP BY
+        month
+    ORDER BY
+        month
+  </select>
+
+  <!-- 관리자 대시보드 - 여행후기 게시글 차트 값... -->
+  <select id="touroviewCountGraph" resultType="ChartVO">
+    SELECT DATE_FORMAT(touroview_regdate, '%y.%m') AS MONTH,
+    Count(DATE_FORMAT(touroview_regdate, '%y.%m')) AS count_month
+    FROM touroview
+    WHERE touroview_regdate &gt; CURDATE() - INTERVAL 6 MONTH
+    GROUP BY
+        MONTH
+    ORDER BY
+        MONTH;
+  </select>
+
+  <!-- 관리자 대시보드 - 여행친구 찾기 게시글 차트 값... -->
+  <select id="touromateCountGraph" resultType="ChartVO">
+    SELECT DATE_FORMAT(touro_mate_date, '%y.%m') AS MONTH,
+    Count(DATE_FORMAT(touro_mate_date, '%y.%m')) AS count_month
+    FROM touro_mate
+    WHERE touro_mate_date &gt; CURDATE() - INTERVAL 6 MONTH
+    GROUP BY
+        MONTH
+    ORDER BY
+        MONTH;
+  </select>
+
+  <!-- 관리자 대시보드 영수증 리뷰 그래프 -->
+  <select id="receiptCountGraph">
+    SELECT DATE_FORMAT(receipt_date, '%y.%m') AS MONTH,
+    Count(DATE_FORMAT(receipt_date, '%y.%m')) AS count_month
+    FROM receipt
+    WHERE receipt_date &gt; CURDATE() - INTERVAL 6 MONTH
+    GROUP BY
+        MONTH
+    ORDER BY
+        MONTH;
+  </select>
+
+  <!-- 여행지 - 리뷰 달기 -->
+  <insert id="reviewInsert" parameterType="TourReviewVO">
+    INSERT INTO tour_review(user_id, tour_num, tour_review_content, tour_review_star, tour_review_regdate)
+    VALUES (#{user_id}, #{tour_num}, #{tour_review_content}, #{tour_review_star}, NOW()) 
+  </insert>
+
+  <!-- 여행지 - 리뷰 가져오기 -->
+  <select id="reviewSelect" parameterType="TourReviewVO" resultType="TourReviewVO">
+    SELECT DISTINCT tr.*, i.*
+    FROM   tour_review tr LEFT JOIN img_detail idn ON tr.user_id = idn.user_id
+    LEFT JOIN img i ON idn.img_num = i.img_num
+    WHERE  tr.tour_num = #{tour_num}
+    ORDER BY tr.tour_review_num DESC;
+  </select>
+
+   <!-- 여행후기 게시판 - 리뷰 달기 -->
+  <insert id="touroviewReviewInsert" parameterType="TouroviewReviewVO">
+    INSERT INTO touroview_review(user_id, touroview_num, touroview_review_content, touroview_review_star, touroview_review_register_date, tour_num)
+    VALUES (#{user_id}, #{touroview_num}, #{touroview_review_content}, #{touroview_review_star}, NOW(), #{tour_num}); 
+  </insert>
+
+  <!-- 여행후기 게시판 - 리뷰 가져오기 -->
+  <select id="touroviewReviewSelect" parameterType="TouroviewReviewVO" resultType="TouroviewReviewVO">
+    SELECT DISTINCT tr.*, i.*
+    FROM   touroview_review tr LEFT JOIN img_detail idn ON tr.user_id = idn.user_id
+    LEFT JOIN img i ON idn.img_num = i.img_num
+    WHERE  tr.touroview_num = #{touroview_num}
+    ORDER BY tr.touroview_review_num DESC;
+  </select>
+
+  <!-- 관리자 유저 상세정보 보기 -->
+  <select id='userListOne' parameterType="String" resultType="AdminVO">
+    SELECT 	DISTINCT u.user_id userId, 
+		u.user_name userName, 
+		u.user_pass userPass, 
+		u.user_tel userTel, 
+		u.user_email userEmail, 
+		u.user_addr userAddr, 
+		u.user_gender userGender, 
+		u.user_age userAge, 
+		u.user_prefer_type1 userPreferType1 , 
+		u.user_prefer_type2 userPreferType2 , 
+		u.user_prefer_type3 userPreferType3, 
+		u.user_prefer_loc1 userPreferLoc1, 
+		u.user_prefer_loc2 userPreferLoc2 ,     
+		u.user_prefer_loc3 userPreferLoc3,              
+		u.admin_authority  adminAuthority ,             
+		u.user_login_authority userLoginAuthority,         
+		DATE_FORMAT(u.user_register_date, '%Y-%m-%d') userRegisterDate,              
+		u.user_delete_date userDeleteDate,
+		i.img_real_name imgRealName
+		FROM `user` u
+		LEFT JOIN
+			`img_detail` imgde ON u.user_id = imgde.user_id
+		LEFT JOIN
+			`img` i ON imgde.img_num = i.img_num
+		WHERE u.admin_authority = 1 AND u.user_id = #{user_id};
+  </select>
+
+
+  <!-- 메인 페이지 베스트 리뷰어 -->
+  
+
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.coding.dao.ImgDAO">
+
+    <!-- ************* ImgDAO의 메소드명과 id가 동일해야 함 -->
+							<!--  resultType = 원래는 com.example.domain.BoardVO-->
+    <insert id="insertFile" parameterType="ImgVO">
+        INSERT INTO img
+               ( 
+                img_name
+                , img_real_name
+                , img_path
+                ) 
+        VALUES ( 
+                #{img_name}
+                , #{img_real_name}
+                , #{img_path}
+                )
+    </insert>
+
+    <insert id="insertFileDetail" parameterType="ImgDetailVO">
+        INSERT INTO img_detail
+               ( 
+                user_id
+                , img_num
+                ) 
+        VALUES ( 
+                #{user_id}
+                , #{img_num}
+                )
+    </insert>
+    
+    <!-- img 테이블에 최근 img_num 값을 검색 -->
+    <select id="selectNum" resultType="Long">
+        SELECT img_num
+        FROM img
+        ORDER BY img_num DESC LIMIT 1
+    </select>
+
+
+    <insert id="insertMateImg" parameterType="ImgVO">
+        INSERT INTO img
+               ( 
+                img_name
+                , img_real_name
+                , img_path
+                ) 
+        VALUES ( 
+                #{img_name}
+                , #{img_real_name}
+                , #{img_path}
+                )
+    </insert>
+
+
+    <insert id="insertViewImg" parameterType="ImgVO">
+        INSERT INTO img
+               ( 
+                img_name
+                , img_real_name
+                , img_path
+                ) 
+        VALUES ( 
+                #{img_name}
+                , #{img_real_name}
+                , #{img_path}
+                )
+    </insert>
+
+</mapper>

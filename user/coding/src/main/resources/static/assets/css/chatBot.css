@@ -1,0 +1,107 @@
+/* 수정해야함 */
+#chatButton {
+  width: 100px;
+  height: 145px;
+  position: fixed;
+  right: 10px;
+  bottom: 100px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px 0 0 5px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  z-index: 10;
+  text-align: center;
+  padding-bottom: 30px;
+  padding-top: 10px;
+  padding-left: 15px;
+  padding-right: 20px;
+  font-size: 20px;
+}
+
+#chatContainer {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: none;
+  position: fixed;
+  right: 0;
+  bottom: 100px;
+  width: 400px;
+  height: 500px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px 10px 10px 10px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+#chatContent {
+  padding: 10px;
+  overflow-y: auto;
+  height: calc(100% - 100px);
+  align-items: center;
+  word-break: break-all;
+}
+
+#chatContent .testimonial.user {
+  padding-bottom: 30px;
+  padding-right: 0;
+  width: 100px;
+  display: contents;
+  text-align: end;
+}
+
+#chatContent .testimonial.user .right-part {
+  margin-right: 5%;
+}
+
+#chatContent .testimonial.botq {
+  padding-bottom: 20px;
+  padding-right: 0;
+  width: 100px;
+  display: contents;
+  text-align: end;
+}
+
+#chatContent .testimonial.botq .right-part {
+  text-align: left;
+}
+
+#chatContent .testimonial.bota {
+  padding-bottom: 30px;
+  padding-right: 0;
+  width: 100px;
+  display: contents;
+  text-align: center;
+  align-items: center;
+}
+
+#chatContent img {
+  width: 50px;
+  height: 50px;
+}
+
+#chatInput {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: none;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-radius: 10px 10px 10px 10px;
+}
+
+/*
+#chatContainer button {
+  align-self: center;
+  width: calc(98% / 2);
+  padding-bottom: 10px;
+  padding-top: 10px;
+  box-sizing: border-box;
+  border: none;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+*/

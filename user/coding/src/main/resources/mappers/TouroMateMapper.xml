@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.coding.dao.TouroMateDAO">
+    <!-- 여행 친구 찾기 게시글 리스트 -->
+   <select id="getSelectedMateList" resultType="TouroMateVO">
+        SELECT touro_mate_num, touro_mate_title, touro_mate_date, user_id
+        FROM touro_mate
+        ORDER BY touro_mate_date DESC;
+    </select>
+    
+    <!-- 검색 게시물 -->
+    <select id="searchMateList" resultType="TouroMateVO" parameterType="String">
+        SELECT touro_mate_title, touro_mate_date, user_id FROM touro_mate
+        <where>
+            <if test="searchKeyword != null and searchKeyword.length() >= 2">
+                AND touro_mate_title LIKE CONCAT('%', #{searchKeyword}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 전체 게시글 개수 -->
+    <select id="getTotalMateCount" resultType="int">
+        SELECT COUNT(*) FROM touro_mate;
+    </select>
+
+    <insert id="registerTouroMateAndChat" parameterType="TouroMateVO">
+        <!-- 아래의 selectKey를 추가하여 touro_mate_num을 생성 -->
+        <selectKey keyProperty="touro_mate_num" resultType="int" order="BEFORE">
+            SELECT COALESCE(MAX(touro_mate_num), 0) + 1 FROM touro_mate
+        </selectKey>
+        <!-- 첫 번째 INSERT는 touro_mate에 값을 저장 -->
+        INSERT INTO touro_mate (touro_mate_num, user_id, touro_mate_title, touro_mate_count, touro_mate_content,
+            touro_mate_name1, touro_mate_name2, touro_mate_name3,
+            touro_mate_addr1, touro_mate_addr2, touro_mate_addr3, touro_mate_date)
+        VALUES (#{touro_mate_num}, #{user_id}, #{touro_mate_title}, #{touro_mate_count}, #{touro_mate_content},
+            #{touro_mate_name1}, #{touro_mate_name2}, #{touro_mate_name3},
+            #{touro_mate_addr1}, #{touro_mate_addr2}, #{touro_mate_addr3}, NOW());
+    </insert>
+
+    <insert id="registerTouroMateChat" parameterType="TouroMateVO">
+        <!-- 두 번째 INSERT는 tour_mate_chat에 값을 저장 -->
+        INSERT INTO tour_mate_chat (touro_mate_num, user_id, chat_user_count, chat_in_out)
+        VALUES (#{touro_mate_num}, #{user_id}, #{touro_mate_count}, 0);
+    </insert>
+
+
+    <!-- detail 페이지 -->
+    <select id="getTouroMateById" resultType="TouroMateVO" parameterType="Object">
+        SELECT touro_mate_num, user_id, touro_mate_title, touro_mate_count, touro_mate_content,
+            touro_mate_name1, touro_mate_name2, touro_mate_name3,
+            touro_mate_addr1, touro_mate_addr2, touro_mate_addr3, touro_mate_date
+        FROM touro_mate
+        WHERE touro_mate_num = #{touro_mate_num}
+    </select>
+
+    <!-- 여행지 정보 가져오기 -->
+    <select id="getTravelPlaces" resultType="TouroMateVO">
+        SELECT touro_mate_num, touro_mate_name1, touro_mate_name2, touro_mate_name3,
+            touro_mate_addr1, touro_mate_addr2, touro_mate_addr3
+        FROM touro_mate
+        WHERE touro_mate_num = #{touro_mate_num}
+    </select>
+
+    <!-- 게시글 작성자 정보 가져오기 -->
+    <select id="getAuthorInfo" resultType="UserVO" parameterType="String">
+        SELECT DISTINCT u.user_id as user_id, u.user_tel, u.user_email, u.user_gender, u.user_age,
+            u.user_prefer_type1, u.user_prefer_type2, u.user_prefer_type3
+        FROM touro_mate tm
+        INNER JOIN user u ON tm.user_id = u.user_id
+        WHERE tm.user_id = #{userId}
+    </select>
+
+    <!-- 채팅 참가 버튼이 눌렸을 때, 유저 값 tour_mate_chat_user 에 저장 -->
+    <insert id="joinChat" parameterType="TouroMateChatUserVO">
+        INSERT INTO tour_mate_chat_user (chat_num, user_id)
+        VALUES (#{chat_num}, #{user_id});
+    </insert>
+
+    <!-- 이미 참여한 유저인지 확인하는 쿼리 -->
+    <select id="checkUserInChat" resultType="int" parameterType="Map">
+        SELECT COUNT(*) FROM tour_mate_chat_user
+        WHERE user_id = #{user_id} AND chat_num = #{chat_num}
+    </select>
+
+    <!-- 여행친구찾기 이름 찾기 -->
+    <select id="selectMateNum" resultType="int">
+        SELECT touro_mate_num
+        FROM touro_mate
+        ORDER BY touro_mate_num DESC LIMIT 1
+    </select>
+
+    <!-- 디테일 이미지 가져오기 -->
+    <select id="getImages" parameterType="int" resultType="ImgVO">
+        SELECT i.img_real_name img_real_name
+        FROM   img_detail id INNER JOIN img i ON id.img_num = i.img_num 
+        WHERE  id.touro_mate_num = #{touro_mate_num}
+    </select>
+
+
+
+    <select id="getCurrentChatUsers" resultType="int" parameterType="int">
+        SELECT COUNT(*) FROM tour_mate_chat_user
+        WHERE chat_num = #{touro_mate_num}
+    </select>
+
+    <!-- 채팅방의 최대 입장 인원수 조회 -->
+    <select id="getMaxChatUsers" resultType="int" parameterType="int">
+        SELECT chat_user_count FROM tour_mate_chat
+        WHERE touro_mate_num = #{touro_mate_num}
+    </select>
+
+    <!-- 사용자 프로필 이미지 가져오기 -->
+    <select id="getProfile" parameterType="UserProfileVO" resultType="UserProfileVO">
+        SELECT c.img_real_name
+        FROM user a JOIN img_detail b ON a.user_id = b.user_id
+        JOIN img c ON b.img_num = c.img_num
+        WHERE a.user_id = #{user_id}
+    </select>
+
+    <!-- 게시물 삭제 -->
+    <delete id="deleteTouroMate" parameterType="TouroMateVO">
+        DELETE FROM touro_mate WHERE touro_mate_num = #{touro_mate_num} AND user_id = #{user_id}
+    </delete>
+
+    <!-- 작성자 정보 가져오기 -->
+    <select id="getAuthorInfoById" resultType="UserVO" parameterType="int">
+        SELECT user_id FROM touro_mate WHERE touro_mate_num = #{touro_mate_num}
+    </select>
+
+    <!-- 좋아요 추가 -->
+    <insert id="addWishListmate" parameterType="LikeVO">
+        INSERT INTO `like` (touroview_num, user_id, like_count, touro_mate_num)
+        VALUES (NULL, #{user_id}, '1', #{touro_mate_num})
+    </insert>
+
+    <!-- 좋아요 확인 -->
+    <select id="ckWishListmate" resultType="int" parameterType="LikeVO">
+        SELECT count(*) 
+        FROM `like` 
+        WHERE user_id = #{user_id} AND touro_mate_num = #{touro_mate_num}
+    </select>
+
+    <!-- 좋아요 삭제 -->
+    <delete id="deleteWishListmate" parameterType="LikeVO">
+        DELETE FROM `like` 
+       WHERE user_id = #{user_id} AND touro_mate_num = #{touro_mate_num}
+    </delete>
+
+    <!-- 랜덤 여행지 - 3개 -->
+    <select id="getRandTour" resultType="TourVO">
+        SELECT *, SUBSTRING(tour_content, 1, 200) AS tour_contents FROM tour
+        ORDER BY RAND()
+        LIMIT 3;
+    </select>
+
+
+</mapper> 
