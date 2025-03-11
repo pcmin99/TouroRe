@@ -33,12 +33,12 @@ public class MainServiceImpl implements MainService{
   }
   
   // 유저 선호 지역으로 사계절 갈 만한 곳 보여주기
-  @Override
-  public List<MainVO> seasonRecommand(UserVO vo) {
-    List<MainVO> result = mainDAO.seasonRecommand(vo);
-    // System.out.println("Service" + result);
-    return result;
-  }
+  // @Override
+  // public List<MainVO> seasonRecommand(UserVO vo) {
+  //   List<MainVO> result = mainDAO.seasonRecommand(vo);
+  //   // System.out.println("Service" + result);
+  //   return result;
+  // }
 
   // 메인 유저 선호 1순위 여행지 타입에 대한 여행지 추천
   @Override

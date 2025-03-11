@@ -47,42 +47,42 @@ public class MainController {
   
   // 유저 선호 지역정보 가져오기
   // 유저 선호 지역으로 사계절 갈 만한 곳 보여주기
-  @RequestMapping(value = "/touro")
-  public void seasonRecommand(HttpServletRequest request, UserVO vo, Model m, MainVO mainvo) {
-    // 세션에서 유저 아이디 가져오기
-    String userId = (String) request.getSession().getAttribute("loggedId");
-    System.out.println("===="+userId);
+  // @RequestMapping(value = "/touro")
+  // public void seasonRecommand(HttpServletRequest request, UserVO vo, Model m, MainVO mainvo) {
+  //   // 세션에서 유저 아이디 가져오기
+  //   String userId = (String) request.getSession().getAttribute("loggedId");
+  //   System.out.println("===="+userId);
 
-    // UserVO user = (UserVO) request.getSession().getAttribute("loggedInUser");
-    // String user_Id = user.getUser_id();
-    // if(user_Id != null) {
-    //   vo.setUser_id(user_Id);                                                                                                                                                                                                                                                                          
-    //   mainvo.setUser_id(user_Id);
-    // } else {
-    //   vo.setUser_id("Byounggon");
-    //   mainvo.setUser_id("Byounggon");
-    // }
-    // System.out.println("^^^^^^^^"+user_Id);
+  //   // UserVO user = (UserVO) request.getSession().getAttribute("loggedInUser");
+  //   // String user_Id = user.getUser_id();
+  //   // if(user_Id != null) {
+  //   //   vo.setUser_id(user_Id);                                                                                                                                                                                                                                                                          
+  //   //   mainvo.setUser_id(user_Id);
+  //   // } else {
+  //   //   vo.setUser_id("Byounggon");
+  //   //   mainvo.setUser_id("Byounggon");
+  //   // }
+  //   // System.out.println("^^^^^^^^"+user_Id);
 
-    if(userId != null) {
-      vo.setUser_id(userId);                                                                                                                                                                                                                                                                          
-      mainvo.setUser_id(userId);
-    } else {
-      vo.setUser_id("Byounggon");
-      mainvo.setUser_id("Byounggon");
-    }
-    System.out.println(mainvo.getUser_id());
-    // vo.setUser_id("dlwldus");
-    List<MainVO> result = mainService.seasonRecommand(vo);
-    MainVO userLoc = mainService.getUserInfo(mainvo);
-    // System.out.println(userLoc);
-    m.addAttribute("userLoc", userLoc);
-    // System.out.println(result);
-    // return result;
-    m.addAttribute("winter", result);
-    List<MainVO> bestReviewer = mainService.bestReviewer();
-    m.addAttribute("bestReview", bestReviewer);
-  }
+  //   if(userId != null) {
+  //     vo.setUser_id(userId);                                                                                                                                                                                                                                                                          
+  //     mainvo.setUser_id(userId);
+  //   } else {
+  //     vo.setUser_id("Byounggon");
+  //     mainvo.setUser_id("Byounggon");
+  //   }
+  //   System.out.println(mainvo.getUser_id());
+  //   // vo.setUser_id("dlwldus");
+  //   List<MainVO> result = mainService.seasonRecommand(vo);
+  //   MainVO userLoc = mainService.getUserInfo(mainvo);
+  //   // System.out.println(userLoc);
+  //   m.addAttribute("userLoc", userLoc);
+  //   // System.out.println(result);
+  //   // return result;
+  //   m.addAttribute("winter", result);
+  //   List<MainVO> bestReviewer = mainService.bestReviewer();
+  //   m.addAttribute("bestReview", bestReviewer);
+  // }
 
   // // 메인 유저 선호 1순위 여행지 타입에 대한 여행지 추천
   // // 세션의 유저 아이디 파이썬으로 전송

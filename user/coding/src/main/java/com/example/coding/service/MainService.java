@@ -20,7 +20,7 @@ public interface MainService {
   public MainVO preferLoc(UserVO vo);
 
   // 유저 선호 지역으로 사계절 갈 만한 곳 보여주기
-  public List<MainVO> seasonRecommand(UserVO vo);
+  //public List<MainVO> seasonRecommand(UserVO vo);
 
   // 메인 유저 선호 1순위 여행지 타입에 대한 여행지 추천
   public List<TourVO> getReco1(Reco1VO vo);
