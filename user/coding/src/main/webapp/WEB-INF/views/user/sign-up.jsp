@@ -260,7 +260,7 @@
                             <option value="" disabled selected hidden>선택</option>
                             <option value="관광지">관광지 위주</option>
                             <option value="음식">맛집 위주</option>
-                            <option value="숙박">숙소 위주</option>>
+                            <option value="숙박">숙소 위주</option>
                           </select>
                         </div>
                       </div>

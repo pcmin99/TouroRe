@@ -332,13 +332,17 @@
                           </a>
                         </li>
                         <!-- 페이징 번호 동적으로 생성 -->
-                        <c:forEach begin="0" end="${touroviewPage-2}" varStatus="status">
+                        <%-- <c:forEach begin="0" end="${touroviewPage-2}" varStatus="status">
                           <li class="page-item ${status.index == currentPage ? 'active' : ''}">
                             <a class="page-link" href="/touroview/touroview_list?page=${status.index}">
                               ${status.index+1}
                             </a>
                           </li>
                         </c:forEach>
+                        --%>
+
+
+
                         <!-- 다음 페이지 이동 버튼 -->
                         <li class="page-item">
                           <a class="page-link" href="/touroview/touroview_list?page=${currentPage + 1}"

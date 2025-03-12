@@ -9,6 +9,7 @@ public class InquiryVO {
    private String inquiry_content;  // 내용
    private Integer inquiry_process; // 답변 여부
    private String user_id;          // 유저 아이디
+
    private String tour_num;         // 여행지 번호
    private String inquiry_regdate;  // 문의 날짜
 

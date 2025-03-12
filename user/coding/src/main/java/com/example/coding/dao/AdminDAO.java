@@ -2,6 +2,9 @@ package com.example.coding.dao;
 
 import java.util.List;
 
+import com.example.coding.domain.AdminTourVO;
+import com.example.coding.domain.FooterTourListVO;
+import com.example.coding.domain.FooterTouroViewVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.example.coding.domain.AdminVO;
@@ -10,7 +13,7 @@ import com.example.coding.domain.AdminVO;
 public interface AdminDAO {
 
     // 여행지 관련
-    public List<AdminVO> tourList();
+    public List<AdminTourVO> tourList();
 
     public AdminVO tourdetail(AdminVO vo);
 
@@ -37,10 +40,10 @@ public interface AdminDAO {
 
 
     // 푸터 여행지 별점  가장 높은 6 얘들 출력
-    public List<AdminVO> footer_tour_list();
+    public List<FooterTourListVO> footer_tour_list();
 
     // 푸터 후기 게시판 좋아요 top4 출력
-    public List<AdminVO> footer_toroview_list();
+    public List<FooterTouroViewVO> footer_toroview_list();
 
     // 문의 리스트
     public List<AdminVO> inquiry();

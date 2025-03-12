@@ -8,19 +8,15 @@
 	<!-- ******************* BoardDAO에 메소드명이랑 동일 ( id 값이 )  -->
 										<!-- 원래 : com.example.domain.BoardVO -->
 
-	<!-- 여행지 리스트 -->
-	<select id="tourList" resultType="AdminVO">
-		SELECT t.tour_name tourName, t.tour_num tourNum, c.check_num checkNum
-		FROM tour t
-		LEFT OUTER JOIN `check` c
-		ON c.tour_num = t.tour_num
-
+	<!-- 여행지 리스트 단순 Select index 사용 확인 O-->
+	<select id="tourList" resultType="AdminTourVO">
+		SELECT tour_name tourName, tour_num tourNum
+		FROM tour
 	</select>
 	
 	<!-- 여행지 디테일 페이지-->
 	<select id="tourdetail" parameterType="AdminVO" resultType="AdminVO">
-	
-		SELECT *
+		SELECT t.*, id.*, ig.*
 		FROM tour t
 		LEFT OUTER JOIN img_detail id ON id.tour_num = t.tour_num
 		LEFT OUTER JOIN img ig ON ig.img_num = id.img_num
@@ -29,17 +25,14 @@
 
 	<!-- 여행지 삭제 -->
 	<delete id="deleteNum" parameterType="AdminVO" >
-
 		DELETE FROM tour WHERE tour_num = #{tour_num} AND NOT EXISTS (SELECT 1 FROM touroview WHERE touroview.tour_num = tour.tour_num);
 
 	</delete>
 
 	<!--여행지 등록 -->
 	<insert id="tourInsert" parameterType="AdminVO">
-
 		INSERT INTO tour (tour_num,tour_name, tour_addr, tour_content, tour_site_addr, tour_img1_path) 
 		VALUES (#{tour_num}, #{tour_name}, #{tour_addr}, #{tour_content}, #{tour_site_addr}, #{tour_img1_path})
-	
 	</insert>
 	
 	<!--유저 리스트 -->
@@ -119,53 +112,57 @@
 		tr.tour_name tour_name,
 		tvw.touroview_num touroview_num
 	FROM touroview tvw
-	LEFT JOIN `like` li ON li.touroview_num = tvw.touroview_num
-	LEFT JOIN `report` rp ON rp.touroview_num = tvw.touroview_num
-	LEFT JOIN `tour` tr ON tr.tour_num = tvw.tour_num
+		LEFT JOIN `like` li
+			ON li.touroview_num = tvw.touroview_num
+		LEFT JOIN `report` rp
+			ON rp.touroview_num = tvw.touroview_num
+		LEFT JOIN `tour` tr
+			ON tr.tour_num = tvw.tour_num
 	WHERE tvw.touroview_title LIKE CONCAT('%', #{touroview_title}, '%')
-	OR tr.tour_name LIKE CONCAT('%', #{tour_name}, '%')
-	OR tvw.user_id LIKE CONCAT('%', #{user_id}, '%')
-	OR tvw.touroview_content LIKE CONCAT('%', #{touroview_content}, '%')
+		OR tr.tour_name LIKE CONCAT('%', #{tour_name}, '%')
+		OR tvw.user_id LIKE CONCAT('%', #{user_id}, '%')
+		OR tvw.touroview_content LIKE CONCAT('%', #{touroview_content}, '%')
 	</select>
 
-	<!-- 푸터 가장 높은 별점 여행지 6개만 출력 -->
-	<select id = "footer_tour_list" resultType="AdminVO">
-	SELECT *
+	<!-- 푸터 가장 높은 별점 여행지 6개만 출력  O -->
+	<select id = "footer_tour_list" resultType="FooterTourListVO">
+	SELECT tour_num, tour_name, tour_img1_path
 	FROM `tour`
 	ORDER BY tour_star DESC
 	LIMIT 6;
 	</select>
 
-	<select id ="footer_toroview_list" resultType="AdminVO">
-		SELECT 
-    tvw.touroview_num touroview_num, 
-    tvw.user_id user_id,
-    tvw.tour_num tour_num,
-		SUBSTRING(tvw.touroview_title, 1, 3) AS touroview_title,
-    SUBSTRING(t.tour_content, 1, 10) AS tour_content,
-    t.tour_name, tvw.user_id, SUM(li.like_count) as like_count,
-    t.tour_name tour_name,
-    t.tour_num tour_num,
-	t.tour_star tour_star,
-	t.tour_img1_path tour_img1_path,
-	t.tour_img2_path tour_img2_path
-    FROM touroview tvw
-    INNER JOIN tour t ON tvw.tour_num = t.tour_num
-    LEFT JOIN `like` li ON tvw.touroview_num = li.touroview_num
-    LEFT JOIN report r ON tvw.touroview_num = r.touroview_num
-    WHERE r.report_count = 0 OR r.report_count IS NULL AND like_count <![CDATA[>=]]> 0
-    GROUP BY tvw.touroview_num, t.tour_name, tvw.user_id
-    ORDER BY like_count DESC
-   	LIMIT 6;
+	<!--  필요한것 만 완료 O 댓글 보다 여행지가 더 적을 확률이 높아 여행지를 선횅으로 선정: 여행지 < 댓글 < 좋아요 + 서브 쿼리 -->
+	<select id ="footer_toroview_list" resultType="FooterTouroViewVO">
+		SELECT
+			tvw.touroview_num touroview_num,
+			SUBSTRING(tvw.touroview_title, 1, 3) AS touroview_title,
+			IFNULL(like_data.like_count,0) as like_count,
+			t.tour_img1_path tour_img1_path
+		FROM tour t
+			INNER JOIN touroview tvw ON tvw.tour_num = t.tour_num
+			LEFT JOIN (
+					SELECT touroview_num, SUM(like_count) as like_count
+					FROM `like`
+					GROUP BY touroview_num
+					) like_data ON like_data.touroview_num = tvw.touroview_num
+		ORDER BY like_count DESC
+		LIMIT 6;
 	</select>
 
 
 	<!-- 문의 리스트 셀렉-->
 	<select id="inquiry" resultType="AdminVO"> 
-		SELECT iq.inquiry_num inquiry_num, iq.user_id user_id, iq.inquiry_title inquiry_title,
-		iq.inquiry_content inquiry_content, iq.inquiry_process inquiry_process,
-		iq.tour_num tour_num, iq.inquiry_regdate inquiry_regdate,
-		iqr.inquiry_review_num inquiry_review_num, iqr.inquiry_review_content inquiry_review_content
+		SELECT
+			iq.inquiry_num inquiry_num,
+			iq.user_id user_id,
+			iq.inquiry_title inquiry_title,
+			iq.inquiry_content inquiry_content,
+			iq.inquiry_process inquiry_process,
+			iq.tour_num tour_num,
+			iq.inquiry_regdate inquiry_regdate,
+			iqr.inquiry_review_num inquiry_review_num,
+			iqr.inquiry_review_content inquiry_review_content
 		FROM `inquiry` iq
 		LEFT OUTER JOIN `inquiry_review` iqr
 		ON  iq.inquiry_num = iqr.inquiry_num

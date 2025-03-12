@@ -2,6 +2,8 @@ package com.example.coding.controller;
 
 import java.util.List;
 
+import com.example.coding.domain.FooterTourListVO;
+import com.example.coding.domain.FooterTouroViewVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,11 +20,11 @@ public class FooterController {
     @Autowired
     private AdminService adminService;
 
-    // adminvo에 웬만한거 다 있어서 동일하게 씀
+
         @PostMapping(value="/footer")
         @ResponseBody
-        public List<AdminVO> footer_tour_list(Model m) {
-        List<AdminVO> list = adminService.footer_tour_list();
+        public List<FooterTourListVO> footer_tour_list(Model m) {
+        List<FooterTourListVO> list = adminService.footer_tour_list();
         m.addAttribute("footerTourList", list);
         return list;
     }
@@ -30,9 +32,8 @@ public class FooterController {
     // 푸터 후기 게시판 좋아요 개수 top 4 list 
     @PostMapping(value="/footerTouroview")
     @ResponseBody
-    public List<AdminVO> footer_toroview_list(Model m) {
-    List<AdminVO> list = adminService.footer_toroview_list();
-    System.out.println("컨트롤러 탑니당");
+    public List<FooterTouroViewVO> footer_toroview_list(Model m) {
+    List<FooterTouroViewVO> list = adminService.footer_toroview_list();
     m.addAttribute("footerTourList", list);
     return list;
 }

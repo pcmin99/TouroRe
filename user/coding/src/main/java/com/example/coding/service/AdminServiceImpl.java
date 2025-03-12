@@ -2,6 +2,9 @@ package com.example.coding.service;
 
 import java.util.List;
 
+import com.example.coding.domain.AdminTourVO;
+import com.example.coding.domain.FooterTourListVO;
+import com.example.coding.domain.FooterTouroViewVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +20,8 @@ public class AdminServiceImpl implements AdminService {
 
 
 
-    public List<AdminVO> tourList() {
-        List<AdminVO> list = adminDAO.tourList();
-        System.out.println("확인: " + list.size());
+    public List<AdminTourVO> tourList() {
+        List<AdminTourVO> list = adminDAO.tourList();
         return list;
     }
     
@@ -41,7 +43,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public int tourInsert(AdminVO vo) {
-
         return adminDAO.tourInsert(vo);
     }
 
@@ -49,14 +50,12 @@ public class AdminServiceImpl implements AdminService {
     // 유저 리스트 출력
     public List<AdminVO> userList() {
     List<AdminVO> userlist = adminDAO.userList();
-    System.out.println("확인: " + userlist.size());
     return userlist;
     }
 
     // 후기 게시판 리스트 출력
     public List<AdminVO> touroviewList() {
     List<AdminVO> viewList = adminDAO.touroviewList();
-    System.out.println("확인: " + viewList.size());
     return viewList;
     }
     
@@ -71,21 +70,20 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // 푸터 여행지 select
-    public List<AdminVO> footer_tour_list(){
-        List<AdminVO> list = adminDAO.footer_tour_list();
+    public List<FooterTourListVO> footer_tour_list(){
+        List<FooterTourListVO> list = adminDAO.footer_tour_list();
         return list;
     }
 
     // 푸터 후기 게시판 좋아요 top4
-    public List<AdminVO> footer_toroview_list(){
-        List<AdminVO> list = adminDAO.footer_toroview_list();
+    public List<FooterTouroViewVO> footer_toroview_list(){
+        List<FooterTouroViewVO> list = adminDAO.footer_toroview_list();
         return list;
     }
 
     // 문의 리스트
     public List<AdminVO> inquiry() {
         List<AdminVO> list = adminDAO.inquiry();
-        System.out.println("확인: " + list.size());
         return list;
     }
     

@@ -2,12 +2,15 @@ package com.example.coding.service;
 
 import java.util.List;
 
+import com.example.coding.domain.AdminTourVO;
 import com.example.coding.domain.AdminVO;
+import com.example.coding.domain.FooterTourListVO;
+import com.example.coding.domain.FooterTouroViewVO;
 
 public interface AdminService {
 
     // 여행지 
-    List<AdminVO> tourList();
+    List<AdminTourVO> tourList();
     AdminVO tourdetail(AdminVO vo); 
 
 
@@ -33,11 +36,11 @@ public interface AdminService {
 
 
     // 푸터 여행지 관한 select 
-    List<AdminVO> footer_tour_list();
+    List<FooterTourListVO> footer_tour_list();
 
     
     // 푸터 후기 게시판 관한 select 
-    List<AdminVO> footer_toroview_list();
+    List<FooterTouroViewVO> footer_toroview_list();
 
     // 문의 리스트
     List<AdminVO> inquiry();
