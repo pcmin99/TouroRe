@@ -109,12 +109,10 @@ public class TouroMateServiceImpl implements TouroMateService {
     public String joinChat(String user_id, int touro_mate_num, Model m) {
         // 채팅방 번호를 문자열로 변환
         String chat_num = String.valueOf(touro_mate_num);
-        System.out.println("userId" + user_id + touro_mate_num);
 
         // 테이블에 해당 사용자와 채팅방이 존재하는지 확인
         int userCountInChat = TouromateDAO.checkUserInChat(user_id, chat_num);
-        System.out.println("userCountInChat : " + userCountInChat);
-    
+
         try {
             // 채팅방의 현재 사용자 수와 최대 사용자 수
             int currentChatUsers = TouromateDAO.getCurrentChatUsers(touro_mate_num);
@@ -140,8 +138,7 @@ public class TouroMateServiceImpl implements TouroMateService {
                     if (m != null) {
                         m.addAttribute("remainingUsers", remainingUsers);
                     }
-                    System.out.println("userid: " + chatUserVO.getUser_id());
-            
+
                     return "채팅 참가 성공";
             
                 } else {
@@ -166,7 +163,6 @@ public class TouroMateServiceImpl implements TouroMateService {
     // 여행친구찾기 글 이미지 올리기(DETAIL)
     @Override
     public void insertFileMate(ImgDetailVO idvo) {
-        // System.out.println("insertFileMate : " + idvo);
         imgDetailDAO.insertFileMate(idvo);
     }
 
@@ -198,11 +194,8 @@ public class TouroMateServiceImpl implements TouroMateService {
     // 사용자 프로필 가져오기
     @Override
     public UserProfileVO getProfile(UserProfileVO vo) {
-        System.out.println("VO.ID >>> " + vo.getUser_id());
-        System.out.println("VO : " + vo.getImg_real_name());
 
         UserProfileVO result = TouromateDAO.getProfile(vo);
-        System.out.println("리절트 : " + result.getImg_real_name());
         return result;
     }
 

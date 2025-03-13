@@ -76,7 +76,7 @@ function NotificationsCom({ isSettings }) {
     var imageURL = ''
     if(imgSrc != '') {
       let formData = new FormData();
-      formData.append('tour_num', tour_num);
+      //formData.append('tour_num', tour_num);
       formData.append('tour_name', tour_name);
       formData.append('tour_addr', tour_addr);
       formData.append('tour_content', tour_content);

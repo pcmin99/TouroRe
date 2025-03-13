@@ -28,8 +28,7 @@ public class UserServiceImpl implements UserService {
 	public void insertUser(UserVO vo, ImgVO ivo, ImgDetailVO idvo) {
 		// 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(vo.getUser_pass());
-        System.out.println("인코딩 된 비밀번호 : " + encodedPassword);
-		
+
 		vo.setUser_pass(encodedPassword);
 
 		// 파일첨부가 있는 경우
@@ -55,10 +54,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserVO loginCheck(UserVO vo) {
 		// 사용자 아이디를 이용하여 DB에서 저장된 암호화된 비밀번호 가져오기
-		System.out.println("넘겨받은 아이디/비밀번호 : "+vo.getUser_id()+ "/" +vo.getUser_pass());
 		UserVO user = userDAO.passCheck(vo);
-		System.out.println("암호화된 비밀번호 : " + user.getUser_pass());
-	
+
 		if (user != null) {
 			// 데이터베이스에 저장된 암호화된 비밀번호
 			String bcryptPassword = user.getUser_pass();
@@ -66,9 +63,6 @@ public class UserServiceImpl implements UserService {
 			// 사용자가 입력한 비밀번호
 			String inputPassword = vo.getUser_pass();
 
-			System.out.println("입력된 비밀번호: " + bcryptPassword);
-        	System.out.println("데이터베이스에서 가져온 암호화된 비밀번호: " + inputPassword);
-	
 			// BCryptPasswordEncoder.matches()를 사용하여 비밀번호 대조
 			if (passwordEncoder.matches(inputPassword, bcryptPassword)) {
 				// 비밀번호가 일치하면 사용자 정보 반환
@@ -93,7 +87,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserVO selectUser(String user_email,String user_id) {
 		UserVO result = userDAO.selectUser(user_email,user_id);
-		System.out.println(result);
 		return result;
 	}
 
@@ -103,14 +96,9 @@ public class UserServiceImpl implements UserService {
 
 		// 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(vo.getUser_pass());
-        System.out.println("인코딩 된 비밀번호 : " + encodedPassword);
-		
 		vo.setUser_pass(encodedPassword);
-		System.out.println("변경된 비밀번호 : " + vo.getUser_pass());
-		
 
 		int result = userDAO.modifyPassword(vo);
-		System.out.println("비밀번호 변경 ==>"+result);
 		return result;
 	}
 }

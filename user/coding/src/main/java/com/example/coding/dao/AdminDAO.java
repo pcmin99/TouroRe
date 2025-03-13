@@ -2,12 +2,8 @@ package com.example.coding.dao;
 
 import java.util.List;
 
-import com.example.coding.domain.AdminTourVO;
-import com.example.coding.domain.FooterTourListVO;
-import com.example.coding.domain.FooterTouroViewVO;
+import com.example.coding.domain.*;
 import org.apache.ibatis.annotations.Mapper;
-
-import com.example.coding.domain.AdminVO;
 
 @Mapper
 public interface AdminDAO {
@@ -36,7 +32,7 @@ public interface AdminDAO {
     public int modifyTour(AdminVO vo );
 
     // 후기 게시판 리스트 내부에서 리스트 검색
-    public List<AdminVO> search_touro( String search_touro);
+    public List<AdminSearchTouro> search_touro( String search_touroplus);
 
 
     // 푸터 여행지 별점  가장 높은 6 얘들 출력
@@ -46,7 +42,7 @@ public interface AdminDAO {
     public List<FooterTouroViewVO> footer_toroview_list();
 
     // 문의 리스트
-    public List<AdminVO> inquiry();
+    public List<InquiryVO> inquiry();
 
     
 }

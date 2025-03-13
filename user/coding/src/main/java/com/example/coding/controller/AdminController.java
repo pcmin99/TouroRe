@@ -3,7 +3,7 @@ package com.example.coding.controller;
 import java.io.File;
 import java.util.List;
 
-import com.example.coding.domain.AdminTourVO;
+import com.example.coding.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,9 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.coding.dao.AdminRepository;
 import com.example.coding.dao.AdminUserRepository;
-import com.example.coding.domain.AdminTourJpaVO;
-import com.example.coding.domain.AdminUserJpaVO;
-import com.example.coding.domain.AdminVO;
 import com.example.coding.service.AdminService;
 import com.example.coding.util.MD5Generator;
 
@@ -58,11 +55,20 @@ public class AdminController {
         return repo.findByTourNameLike("%" + search_tourName + "%");
     }
 
+
+    // touroview ( 후기 게시판 ) 리스트 출력
+    @GetMapping("/touroview-list/touroviewList")
+    public List<AdminVO> touroviewList(Model m) {
+        List<AdminVO> viewLists = adminService.touroviewList();
+        m.addAttribute("touroviewList", viewLists);
+        return viewLists;
+    }
+
     // 후기 게시판 리스트 내부에서 검색
     @GetMapping("/touroview-list/search_touro")
-    public List<AdminVO> search_touro (@RequestParam("search_touro")String search_touro ){
+    public List<AdminSearchTouro> search_touro (@RequestParam String search_touro ){
         return adminService.search_touro(search_touro);
-    };
+    }
 
     // 여행지 디테일 페이지
     @GetMapping("/tour-view/{tourNum}")
@@ -83,7 +89,7 @@ public class AdminController {
         adminService.deleteNum(vo);
     }
 
-    // 여행지 등록 
+    // 여행지 등록
     @PostMapping("/tour-register/tourInsert")
     public void tourInsert(AdminVO vo, @RequestParam("mutipartFile") MultipartFile mutipartFile) {
 
@@ -97,12 +103,12 @@ public class AdminController {
             String save_path = System.getProperty("user.dir")+"\\src\\main\\resources\\static\\tourimg";
             if( !new File(save_path).exists() ){
                 new File(save_path).mkdir();
-            } 
+            }
             String img_path = save_path + "\\" + img_real_name;
 
             // 파일저장
             mutipartFile.transferTo(new File(img_path));
-            
+
             // 디비저장을 위해서 파일정보 덩어리 만들기
             vo.setTour_img1_path("tourimg\\" + img_real_name);
             adminService.tourInsert(vo);
@@ -111,7 +117,7 @@ public class AdminController {
         }
 }
 
-    
+
     // 전체 회원 전체 리스트 띄우는 컨트롤러 (My batis)
     @GetMapping("/user/userList")
     public List<AdminVO> userList(Model m) {
@@ -133,13 +139,6 @@ public class AdminController {
     }
 
 
-    // touroview ( 후기 게시판 ) 리스트 출력
-    @GetMapping("/touroview-list/touroviewList")
-    public List<AdminVO> touroviewList(Model m) {
-        List<AdminVO> viewLists = adminService.touroviewList();
-        m.addAttribute("touroviewList", viewLists);
-        return viewLists;
-    }
 
     // 후기 게시판 디테일 페이지 관련 
     @GetMapping("/tour-list/touroviewNum/{touroview_num}")
@@ -156,10 +155,10 @@ public class AdminController {
 
     }
 
-    // 문의 게시글
+    // 문의 게시글 (num, title,user_id, regdate,process)
     @GetMapping("/inquiry")
-    public List<AdminVO> inquiry(Model m) {
-        List<AdminVO> list = adminService.inquiry();
+    public List<InquiryVO> inquiry(Model m) {
+        List<InquiryVO> list = adminService.inquiry();
         m.addAttribute("inquiry", list);
         return list;
     }

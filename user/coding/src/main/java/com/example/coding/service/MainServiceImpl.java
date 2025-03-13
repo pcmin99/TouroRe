@@ -28,7 +28,6 @@ public class MainServiceImpl implements MainService{
   @Override
   public MainVO preferLoc(UserVO vo) {
     MainVO result = mainDAO.preferLoc(vo);
-    // System.out.println(result);    
     return result;
   }
   
@@ -65,7 +64,6 @@ public class MainServiceImpl implements MainService{
   @Override
   public MainVO getUserInfo(MainVO vo) {
     MainVO result = mainDAO.getUserInfo(vo);
-    // System.out.println(result);    
     return result;
   }
 
@@ -106,7 +104,6 @@ public class MainServiceImpl implements MainService{
   @Override
   public List<AdminTouroMateVO> touromateList() {
     List<AdminTouroMateVO> mateList = mainDAO.touromateList();
-    System.out.println("MateService"+ mateList);
     return mateList;
   }
 

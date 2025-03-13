@@ -4,7 +4,6 @@ import { ticketsList } from "../../data/ticketsList";
 import { Link } from "react-router-dom";
 import SupportNowModal from "./SupportNowModal";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 function SupportTicketsList() {
   const [page, setPage] = useState(1);
@@ -45,7 +44,6 @@ function SupportTicketsList() {
   const [inQu, setInQu] = useState('')
   const [inquiryReview, setInquiryReview] = useState('');
 
-  const [inquiryReviewNum, setInquiryReviewNum] = useState('')
   
   const [showComponent, setShowComponent] = useState(false);
 
@@ -68,7 +66,6 @@ function SupportTicketsList() {
       setContent(inquirys[inquiryIdx].inquiry_content);
       setUserId(inquirys[inquiryIdx].user_id);
       setInquNum(inquirys[inquiryIdx].inquiry_num);
-      setInquiryReviewNum(inquirys.inquiry_review_num);
       setInquiryReview(inquirys[inquiryIdx].inquiry_review_content)
       // setInQu(inquirys[inquiryIdx])
     }
@@ -87,7 +84,6 @@ function SupportTicketsList() {
     userId = {userId}
     inQu={inQu}
     inquNum={inquNum}
-    inquiryReviewNum={inquiryReviewNum}
     inquiryReview={inquiryReview}
     parentComponent={parentComponent}
     

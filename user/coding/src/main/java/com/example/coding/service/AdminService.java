@@ -2,10 +2,7 @@ package com.example.coding.service;
 
 import java.util.List;
 
-import com.example.coding.domain.AdminTourVO;
-import com.example.coding.domain.AdminVO;
-import com.example.coding.domain.FooterTourListVO;
-import com.example.coding.domain.FooterTouroViewVO;
+import com.example.coding.domain.*;
 
 public interface AdminService {
 
@@ -32,7 +29,7 @@ public interface AdminService {
     public int modifyTour(AdminVO vo);
 
     // 후기 게시판 내부에서 검색 
-    List<AdminVO> search_touro( String search_touro);
+    List<AdminSearchTouro> search_touro( String search_touro);
 
 
     // 푸터 여행지 관한 select 
@@ -43,7 +40,7 @@ public interface AdminService {
     List<FooterTouroViewVO> footer_toroview_list();
 
     // 문의 리스트
-    List<AdminVO> inquiry();
+    List<InquiryVO> inquiry();
 
     
 }

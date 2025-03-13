@@ -6,7 +6,7 @@ import { useNavigate} from "react-router-dom";
 import SupportTicketsList from "./SupportTicketsList";
 
 function SupportNowModal({ isOpen, handleClose, inQu, inqNum, 
-  title, content, userId, testArr,inquNum,inquiryReviewNum, inquiryReview, parentComponent }) {
+  title, content, userId, testArr,inquNum, inquiryReview, parentComponent }) {
 
   //console.log(inquiryReviewNum);
   const baseUrl = "http://localhost:8080";
@@ -22,7 +22,6 @@ function SupportNowModal({ isOpen, handleClose, inQu, inqNum,
   const navigate = useNavigate();
 
   const reloadPage = () => {
-    // navigate('http://localhost:5173/inquiry-list', { replace: true });
     window.location.reload();
   };
 
@@ -31,7 +30,6 @@ function SupportNowModal({ isOpen, handleClose, inQu, inqNum,
     inquiry_review_content : inquiryRe,
     inquiry_num : inquNum
   }
-  // console.log("갑들",inquiryRe,"  ",inquNum);
 
 
   const sendRe = () => { 

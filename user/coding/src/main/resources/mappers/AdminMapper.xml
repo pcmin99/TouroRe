@@ -31,8 +31,8 @@
 
 	<!--여행지 등록 -->
 	<insert id="tourInsert" parameterType="AdminVO">
-		INSERT INTO tour (tour_num,tour_name, tour_addr, tour_content, tour_site_addr, tour_img1_path) 
-		VALUES (#{tour_num}, #{tour_name}, #{tour_addr}, #{tour_content}, #{tour_site_addr}, #{tour_img1_path})
+		INSERT INTO tour (tour_name, tour_addr, tour_content, tour_site_addr, tour_img1_path)
+		VALUES (#{tour_name}, #{tour_addr}, #{tour_content}, #{tour_site_addr}, #{tour_img1_path})
 	</insert>
 	
 	<!--유저 리스트 -->
@@ -65,7 +65,9 @@
 	</select>
 
 
-	<!-- 후기 게시판 리스트-->
+	<!-- 후기 게시판 리스트
+	JOIN 순서 리뷰 < 신고 < 여행지 < 좋아요
+	-->
 	<select  id="touroviewList" parameterType="AdminVO" resultType="AdminVO">
 		SELECT distinct tvw.user_id user_id , 
 		tvw.touroview_content touroview_content, 
@@ -77,14 +79,15 @@
 		,tr.tour_name tour_name
 		,tvw.touroview_num touroview_num
 		FROM 	touroview tvw
-		LEFT  JOIN `like` li ON li.touroview_num = tvw.touroview_num
 		LEFT  JOIN `report` rp ON rp.touroview_num = tvw.touroview_num
 		LEFT  JOIN `tour` tr ON tr.tour_num = tvw.tour_num
+		LEFT  JOIN `like` li ON li.touroview_num = tvw.touroview_num
 	</select>
 
 	<!-- 후기 게시판 상세 디테일-->
 	<select id = "touroViewNum" parameterType="Integer" resultType="AdminVO">
-		SELECT * FROM touroview tvw
+		SELECT *
+		FROM touroview tvw
 		LEFT OUTER JOIN img_detail id ON id.touroview_num = tvw.touroview_num
 		LEFT OUTER JOIN img ig ON ig.img_num = id.img_num
 		WHERE tvw.touroview_num = #{touroview_num}
@@ -97,31 +100,39 @@
 		tr.tour_addr = #{tour_addr},
 		tr.tour_site_addr = #{tour_site_addr}
 	WHERE tr.tour_num = #{tourNum}
-
 	</update>
 
-	<!-- 후기 게시판 내부에서 검색-->
-	<select id = "search_touro" parameterType="AdminVO" resultType="AdminVO">
-	SELECT tvw.user_id user_id,
-		tvw.touroview_content touroview_content,
-		li.like_count like_count,
-		rp.report_count report_count,
-		tvw.touroview_regdate touroview_regdate,
-		tvw.touroview_update touroview_update,
-		tvw.touroview_title touroview_title,
-		tr.tour_name tour_name,
-		tvw.touroview_num touroview_num
-	FROM touroview tvw
+	<!-- 후기 게시판 내부에서 검색
+	외부 검색 엔진 안쓸시
+	Like => FULL TEXT Search 변경
+	full text Search
+	연관 검색 가능
+	like no
+	완료
+	-->
+	<select id = "search_touro" parameterType="AdminSearchTouro" resultType="AdminSearchTouro">
+		SELECT
+			tvw.user_id user_id,
+			li.like_count like_count,
+			rp.report_count report_count,
+			tvw.touroview_regdate touroview_regdate,
+			tvw.touroview_update touroview_update,
+			tvw.touroview_title touroview_title,
+			tr.tour_name tour_name,
+			tvw.touroview_num touroview_num
+		FROM touroview tvw
 		LEFT JOIN `like` li
 			ON li.touroview_num = tvw.touroview_num
 		LEFT JOIN `report` rp
 			ON rp.touroview_num = tvw.touroview_num
 		LEFT JOIN `tour` tr
 			ON tr.tour_num = tvw.tour_num
-	WHERE tvw.touroview_title LIKE CONCAT('%', #{touroview_title}, '%')
-		OR tr.tour_name LIKE CONCAT('%', #{tour_name}, '%')
-		OR tvw.user_id LIKE CONCAT('%', #{user_id}, '%')
-		OR tvw.touroview_content LIKE CONCAT('%', #{touroview_content}, '%')
+		WHERE
+			MATCH(tvw.touroview_title, tvw.user_id)
+			AGAINST(#{search_touroplus} in BOOLEAN MODE)
+		or
+			MATCH(tr.tour_name)
+			AGAINST(#{search_touroplus} in BOOLEAN MODE)
 	</select>
 
 	<!-- 푸터 가장 높은 별점 여행지 6개만 출력  O -->
@@ -151,21 +162,18 @@
 	</select>
 
 
-	<!-- 문의 리스트 셀렉-->
-	<select id="inquiry" resultType="AdminVO"> 
+	<!-- 문의 리스트 셀렉 VO 변경 완
+	 단순 리스트 -> 모달에 까지 상세 내용 전달 해야 하기에
+	 Inqueiry-list = num, user_id, title, proces
+	 inqueiry detail = content, user_id tour_num, review_num 등등
+	 * = 모든것이 필요하고 모달 까지 정보를 넘겨야 하기에 해당 테이블 전체 SELECT
+	 -->
+	<select id="inquiry" resultType="InquiryVO">
 		SELECT
-			iq.inquiry_num inquiry_num,
-			iq.user_id user_id,
-			iq.inquiry_title inquiry_title,
-			iq.inquiry_content inquiry_content,
-			iq.inquiry_process inquiry_process,
-			iq.tour_num tour_num,
-			iq.inquiry_regdate inquiry_regdate,
-			iqr.inquiry_review_num inquiry_review_num,
-			iqr.inquiry_review_content inquiry_review_content
-		FROM `inquiry` iq
-		LEFT OUTER JOIN `inquiry_review` iqr
-		ON  iq.inquiry_num = iqr.inquiry_num
+		iq.* ,
+		iqr.inquiry_review_content inquiry_review_content
+		FROM `inquiry_review` iqr
+		JOIN `inquiry` iq ON  iq.inquiry_num = iqr.inquiry_num
 	</select>
 
 </mapper>

@@ -13,5 +13,5 @@ public class InquiryVO {
    private String tour_num;         // 여행지 번호
    private String inquiry_regdate;  // 문의 날짜
 
-   private String inquiry_review_content; // 문의 답변 
+   private String inquiry_review_content; // 문의 답변
 }

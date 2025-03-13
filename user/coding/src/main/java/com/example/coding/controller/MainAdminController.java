@@ -32,7 +32,6 @@ public class MainAdminController {
   @GetMapping("/touromate-list/touromateList")
   public List<AdminTouroMateVO> touromateList(Model m) {
       List<AdminTouroMateVO> mateLists = mainService.touromateList();
-      System.out.println("Mate"+ mateLists);
       m.addAttribute("touromateList", mateLists);
       return mateLists;
   }
@@ -46,12 +45,7 @@ public class MainAdminController {
   // 관리자 touromate 디테일 페이지 관련 
   @GetMapping("/touromate/touromateNum/{touro_mate_num}")
   public List<AdminVO> touroMateNum(@PathVariable("touro_mate_num") Integer touro_mate_num) {
-      System.out.println("넘" + touro_mate_num);
-      // AdminVO vo = new AdminVO();
-      // vo.setTouroview_num(touroview_num);
       List<AdminVO> result = mainService.touroMateNum(touro_mate_num);
-      // System.out.println("왜 안되니?" + result);
-      // result.setTouroview_num(touroview_num);
       return result;
   }
 
@@ -120,7 +114,6 @@ public class MainAdminController {
   @GetMapping("/touroview-list/blind/count")
   public Integer touroviewBlindCount(@RequestParam Integer touroview_num) {
     Integer result =  mainService.touroviewBlindCount(touroview_num);
-    System.out.println("신고신고" + result);
     return result;
   }
   
@@ -135,8 +128,6 @@ public class MainAdminController {
   // 관리자 문의 답변 보내기 - DB 저장
   @PostMapping("/inquiry/inquiryReview")
   public void inquiryReview(@RequestBody AdminVO vo) {
-    System.out.println(vo.getInquiry_review_content());
-    System.out.println(vo.getInquiry_num());
     mainService.inquiryReview(vo);
   }
 
@@ -149,8 +140,6 @@ public class MainAdminController {
   // 관리자 문의 답변 수정하기 - DB 수정
   @PostMapping("/inquiry/inquiryReviewUpdate")
   public void inquiryReviewUpdate(@RequestBody AdminVO vo) {
-    // System.out.println(vo.getInquiry_review_content());
-    // System.out.println(vo.getInquiry_num());
     mainService.inquiryReviewUpdate(vo);
   }
 
@@ -166,7 +155,6 @@ public class MainAdminController {
   @GetMapping("/wishlist/popularTour")
   public List<AdminVO> popularTour() {
     List<AdminVO> result = mainService.popularTour();
-    // System.out.println(result);
     return result;
   }
 
@@ -174,9 +162,7 @@ public class MainAdminController {
   // 관리자 유저 상세정보 보기
   @GetMapping("/user/userListOne/{user_id}")
   public AdminVO userListOne(@PathVariable("user_id") String user_id) {
-    // System.out.println(user_id);
     AdminVO result = mainService.userListOne(user_id);
-    System.out.println(result.getUserRegisterDate());
     return result;
 
   }

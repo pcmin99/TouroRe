@@ -2,14 +2,11 @@ package com.example.coding.service;
 
 import java.util.List;
 
-import com.example.coding.domain.AdminTourVO;
-import com.example.coding.domain.FooterTourListVO;
-import com.example.coding.domain.FooterTouroViewVO;
+import com.example.coding.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.coding.dao.AdminDAO;
-import com.example.coding.domain.AdminVO;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -26,9 +23,16 @@ public class AdminServiceImpl implements AdminService {
     }
     
     // 후기 게시판 내부에서 search 
-    public List<AdminVO> search_touro(String search_touro){
-        List<AdminVO> list = adminDAO.search_touro(search_touro);
-        return list ; 
+    public List<AdminSearchTouro> search_touro(String search_touro){
+
+            if(search_touro == ""){
+                List<AdminSearchTouro> list = adminDAO.search_touro(search_touro);
+                return list ;
+            }
+            String search_touroplus = search_touro+ '*' ; // SQL 에서 FULL TEST SEARCH 를 쓰면서 lIKE 처럼 연관을 뽑기 위해선 받는 데이터에 * 를 붙여야함
+            List<AdminSearchTouro> list = adminDAO.search_touro(search_touroplus);
+            return list ;
+
     }
 
     // 디테일
@@ -82,8 +86,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // 문의 리스트
-    public List<AdminVO> inquiry() {
-        List<AdminVO> list = adminDAO.inquiry();
+    public List<InquiryVO> inquiry() {
+        List<InquiryVO> list = adminDAO.inquiry();
         return list;
     }
     
