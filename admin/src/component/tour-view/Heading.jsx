@@ -111,19 +111,6 @@ function Heading() {
                 onChange={(e) => setTours({ ...tours, tour_site_addr: e.target.value })}
               />
             </div>
-            {/* <div className="mb-3">
-              <label className="form-label-title ">
-                여행지 전화번호
-              </label>
-              <input
-                style={{ height:'50px' }}
-                type="text"
-                className="form-control"
-                value={tours.tour_tel || ''}
-                onChange={(e) => setTours({ ...tours, tour_tel: e.target.value })}
-              />
-              
-            </div> */}
             <div className="row">
               <div className="col" style={{paddingRight:'10px'}}>
                 <label className="form-label-title ">

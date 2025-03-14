@@ -24,7 +24,6 @@ public class AdminServiceImpl implements AdminService {
     
     // 후기 게시판 내부에서 search 
     public List<AdminSearchTouro> search_touro(String search_touro){
-
             if(search_touro == ""){
                 List<AdminSearchTouro> list = adminDAO.search_touro(search_touro);
                 return list ;
@@ -36,7 +35,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // 디테일
-    public AdminVO tourdetail(AdminVO vo) {
+    public AdminTourDetailVO tourdetail(AdminTourDetailVO vo) {
         return adminDAO.tourdetail(vo);
     }
 
@@ -52,14 +51,14 @@ public class AdminServiceImpl implements AdminService {
 
 
     // 유저 리스트 출력
-    public List<AdminVO> userList() {
-    List<AdminVO> userlist = adminDAO.userList();
+    public List<AdminUserVO> userList() {
+    List<AdminUserVO> userlist = adminDAO.userList();
     return userlist;
     }
 
     // 후기 게시판 리스트 출력
-    public List<AdminVO> touroviewList() {
-    List<AdminVO> viewList = adminDAO.touroviewList();
+    public List<AdminTouroViewList> touroviewList() {
+    List<AdminTouroViewList> viewList = adminDAO.touroviewList();
     return viewList;
     }
     

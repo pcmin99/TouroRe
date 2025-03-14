@@ -58,8 +58,8 @@ public class AdminController {
 
     // touroview ( 후기 게시판 ) 리스트 출력
     @GetMapping("/touroview-list/touroviewList")
-    public List<AdminVO> touroviewList(Model m) {
-        List<AdminVO> viewLists = adminService.touroviewList();
+    public List<AdminTouroViewList> touroviewList(Model m) {
+        List<AdminTouroViewList> viewLists = adminService.touroviewList();
         m.addAttribute("touroviewList", viewLists);
         return viewLists;
     }
@@ -72,10 +72,10 @@ public class AdminController {
 
     // 여행지 디테일 페이지
     @GetMapping("/tour-view/{tourNum}")
-    public AdminVO TourDetail(@PathVariable("tourNum") String tourNum) {
-        AdminVO vo = new AdminVO();
+    public AdminTourDetailVO TourDetail(@PathVariable("tourNum") String tourNum) {
+        AdminTourDetailVO vo = new AdminTourDetailVO();
         vo.setTourNum(tourNum);
-        AdminVO result = adminService.tourdetail(vo);
+        AdminTourDetailVO result = adminService.tourdetail(vo);
         result.setTourNum(tourNum);
         return result;
     }
@@ -120,9 +120,9 @@ public class AdminController {
 
     // 전체 회원 전체 리스트 띄우는 컨트롤러 (My batis)
     @GetMapping("/user/userList")
-    public List<AdminVO> userList(Model m) {
-        List<AdminVO> userlist = adminService.userList();
-        for(AdminVO user : userlist){
+    public List<AdminUserVO> userList(Model m) {
+        List<AdminUserVO> userlist = adminService.userList();
+        for(AdminUserVO user : userlist){
             if(user.getImgRealName() != null) {
                 String path = "../../../../user/coding/src/main/resources/static/assets/images/profile/";
                 String realName = user.getImgRealName();

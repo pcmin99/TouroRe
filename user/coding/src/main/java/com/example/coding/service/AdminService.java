@@ -8,7 +8,7 @@ public interface AdminService {
 
     // 여행지 
     List<AdminTourVO> tourList();
-    AdminVO tourdetail(AdminVO vo); 
+    AdminTourDetailVO tourdetail(AdminTourDetailVO vo);
 
 
     public int deleteNum(AdminVO vo);
@@ -17,10 +17,10 @@ public interface AdminService {
 
 
     // 유저
-    List<AdminVO> userList();
+    List<AdminUserVO> userList();
     
     // 후기 게시판 
-    List<AdminVO> touroviewList();
+    List<AdminTouroViewList> touroviewList();
 
     // 후기 게시판 디테일
     List<AdminVO> touroViewNum(Integer touroview_num); 

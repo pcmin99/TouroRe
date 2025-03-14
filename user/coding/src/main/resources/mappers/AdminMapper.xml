@@ -14,9 +14,19 @@
 		FROM tour
 	</select>
 	
-	<!-- 여행지 디테일 페이지-->
-	<select id="tourdetail" parameterType="AdminVO" resultType="AdminVO">
-		SELECT t.*, id.*, ig.*
+	<!-- 여행지 디테일 페이지
+	VO 교체 O
+	db explain 확인 O
+	-->
+	<select id="tourdetail" parameterType="AdminTourDetailVO" resultType="AdminTourDetailVO">
+		SELECT
+		t.tour_content,
+		t.tour_addr,
+		t.tour_site_addr,
+		t.tour_star,
+		t.tour_num,
+		t.tour_name,
+		ig.img_path
 		FROM tour t
 		LEFT OUTER JOIN img_detail id ON id.tour_num = t.tour_num
 		LEFT OUTER JOIN img ig ON ig.img_num = id.img_num
@@ -35,22 +45,20 @@
 		VALUES (#{tour_name}, #{tour_addr}, #{tour_content}, #{tour_site_addr}, #{tour_img1_path})
 	</insert>
 	
-	<!--유저 리스트 -->
-	<select id = "userList" parameterType="AdminVO" resultType="AdminVO">
-		SELECT u.user_id userId, 
+	<!--유저 리스트
+	 VO 변경 완
+
+	 -->
+	<select id = "userList" parameterType="AdminUserVO" resultType="AdminUserVO">
+		SELECT
+		u.user_id userId,
 		u.user_name userName, 
 		u.user_pass userPass, 
-		u.user_tel userTel, 
+		u.user_tel userTel,
 		u.user_email userEmail, 
 		u.user_addr userAddr, 
 		u.user_gender userGender, 
-		u.user_age userAge, 
-		u.user_prefer_type1 userPreferType1 , 
-		u.user_prefer_type2 userPreferType2 , 
-		u.user_prefer_type3 userPreferType3, 
-		u.user_prefer_loc1 userPreferLoc1, 
-		u.user_prefer_loc2 userPreferLoc2 ,     
-		u.user_prefer_loc3 userPreferLoc3,              
+		u.user_age userAge,
 		u.admin_authority  adminAuthority ,             
 		u.user_login_authority userLoginAuthority,         
 		u.user_register_date userRegisterDate,              
@@ -68,7 +76,7 @@
 	<!-- 후기 게시판 리스트
 	JOIN 순서 리뷰 < 신고 < 여행지 < 좋아요
 	-->
-	<select  id="touroviewList" parameterType="AdminVO" resultType="AdminVO">
+	<select  id="touroviewList" parameterType="AdminTouroViewList" resultType="AdminTouroViewList">
 		SELECT distinct tvw.user_id user_id , 
 		tvw.touroview_content touroview_content, 
 		li.like_count like_count, 

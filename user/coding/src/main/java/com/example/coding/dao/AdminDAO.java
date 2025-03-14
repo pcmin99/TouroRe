@@ -11,7 +11,7 @@ public interface AdminDAO {
     // 여행지 관련
     public List<AdminTourVO> tourList();
 
-    public AdminVO tourdetail(AdminVO vo);
+    public AdminTourDetailVO tourdetail(AdminTourDetailVO vo);
 
     public int deleteNum(AdminVO vo );
 
@@ -19,10 +19,10 @@ public interface AdminDAO {
 
     
     // 회원 리스트 출력
-    public List<AdminVO> userList();
+    public List<AdminUserVO> userList();
 
     //후기 게시판 리스트 출력
-    public List<AdminVO> touroviewList();
+    public List<AdminTouroViewList> touroviewList();
 
     // 게시판 디테일
     public List<AdminVO> touroViewNum(Integer touroview_num);
