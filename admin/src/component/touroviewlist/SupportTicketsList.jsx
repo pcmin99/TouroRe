@@ -42,15 +42,7 @@ function SupportTicketsList() {
   
   // 디테일 페이지 가기
   const detailTouroviewNum = (e,touroview_num) => {
-    e.preventDefault(); // a 태그의 기본 기능 막기
-    // axios.get(`${baseUrl}/tour-list/touroviewNum/${touroview_num}`)
-    // .then((result) => {
-    //   const tourDetails = result.data;
-    //   console.log(tourDetails)
-    // })
-    // .catch((error) => {
-    //   console.error('에러 발생:', error);
-    // }); 
+    e.preventDefault(); // a 태그의 기본 기능 막기 
     navigate(`/touroview/${touroview_num}`);
   };
 
