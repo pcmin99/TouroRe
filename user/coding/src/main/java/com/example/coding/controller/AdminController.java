@@ -90,31 +90,11 @@ public class AdminController {
     }
 
     // 여행지 등록
+    // Controller 에 있는 파일에 대한 비즈니스 로직 Service 단으로 옮김 
+    //  RequestParam 값도 같이 Service단까지 던짐
     @PostMapping("/tour-register/tourInsert")
     public void tourInsert(AdminVO vo, @RequestParam("mutipartFile") MultipartFile mutipartFile) {
-
-        try {
-            String img_name = mutipartFile.getOriginalFilename();
-            String img_real_name = new MD5Generator(img_name).toString();
-
-            // 시스템으로 자동으로 잡아주는 경로 설정
-            // 생성되는 폴더의 위치를 확인 후 추후 변경
-            // => static 폴더 밑으로 이동해야 사용자가 그 파일에 접근 가능
-            String save_path = System.getProperty("user.dir")+"\\src\\main\\resources\\static\\tourimg";
-            if( !new File(save_path).exists() ){
-                new File(save_path).mkdir();
-            }
-            String img_path = save_path + "\\" + img_real_name;
-
-            // 파일저장
-            mutipartFile.transferTo(new File(img_path));
-
-            // 디비저장을 위해서 파일정보 덩어리 만들기
-            vo.setTour_img1_path("tourimg\\" + img_real_name);
-            adminService.tourInsert(vo);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
+            adminService.tourInsert(vo, mutipartFile);
 }
 
 

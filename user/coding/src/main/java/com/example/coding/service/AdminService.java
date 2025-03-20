@@ -3,6 +3,7 @@ package com.example.coding.service;
 import java.util.List;
 
 import com.example.coding.domain.*;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface AdminService {
 
@@ -12,7 +13,7 @@ public interface AdminService {
 
 
     public int deleteNum(AdminVO vo);
-    public int tourInsert(AdminVO vo);
+    public int tourInsert(AdminVO vo, MultipartFile multipartFile);
 
 
 
