@@ -49,14 +49,15 @@ public class AdminServiceImpl implements AdminService {
         int result = adminDAO.deleteNum(vo);
         return result;
     }
-
+    
+    // 등록
     public int tourInsert(AdminVO vo, MultipartFile multipartFile) {
         try {
             String img_name = multipartFile.getOriginalFilename();
             String img_real_name = new MD5Generator(img_name).toString() ;
             String save_path = System.getProperty("user.dir")+"\\src\\main\\resources\\static\\tourimg";
             if( !new File(save_path).exists() ){
-                new File(save_path).mkdir();
+                new File(save_path).mkdir(); // mkdirs는 상위 디렉토리까지 만들어지기에 기본값에 폴더만 만드는 거면 mkdir
             }
             String img_path = save_path + "\\" + img_real_name;
             multipartFile.transferTo(new File(img_path));
@@ -65,17 +66,21 @@ public class AdminServiceImpl implements AdminService {
             e.printStackTrace();
         }
 
-
-
-
-        return adminDAO.tourInsert(vo);
+        return adminDAO.tourInsert(vo); // try에 해당 return 값을 넣을꺼면 catch 부분도 return 값이 있어야 하는데 고민중 25.03 --------------------------------------------------
 
     }
 
 
     // 유저 리스트 출력
+    // ADMINCONTROLLER.userList => 로직 이동 
     public List<AdminUserVO> userList() {
     List<AdminUserVO> userlist = adminDAO.userList();
+    for(AdminUserVO user : userlist){
+        if(user.getImgRealName() != null){
+            String path = "../../../../user/coding/src/main/resources/static/assets/images/profile/" ;
+            String realName =  user.getImgRealName();
+        }
+    }
     return userlist;
     }
 

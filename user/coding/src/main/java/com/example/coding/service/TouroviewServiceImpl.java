@@ -3,6 +3,8 @@ package com.example.coding.service;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,14 +48,28 @@ public class TouroviewServiceImpl implements TouroviewService{
     
     // 후기 게시물 입력
     @Override
-    public void saveTouroview(TouroviewVO touroviewVO){
+    public void saveTouroview(TouroviewVO touroviewVO, HttpServletRequest request){
+        HttpSession seesion = request.getSession();
+        String userId = (String) seesion.getAttribute("logedId");
+        touroviewVO.setUser_id(userId);
+
         // 여행 후기 데이터 저장하는 DAO 메소드 호출
         touroviewDAO.saveTouroview(touroviewVO);
     }
 
+
+    // 여행후기 게시판 등록된 글번호 가져오기
+    @Override
+    public int selectViewNum() {
+
+        return touroviewDAO.selectViewNum();
+    }
+
+
     // 후기 게시물 사진 파일 등록
     @Override
     public void insertFileView(ImgDetailVO idvo) {
+
         imgDetailDAO.insertFileView(idvo);
     }
 
@@ -176,11 +192,6 @@ public class TouroviewServiceImpl implements TouroviewService{
         touroviewDAO.deleteTouroview(touroview_num);
     }
 
-    // 여행후기 게시판 등록된 글번호 가져오기
-    @Override
-    public int selectViewNum() {
-        return touroviewDAO.selectViewNum();
-    }
 
     // 디테일 배경 이미지 가져오기
     @Override

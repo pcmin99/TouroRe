@@ -16,16 +16,11 @@ import com.example.coding.util.MD5Generator;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.tags.shaded.org.apache.xpath.operations.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +31,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 
 
@@ -58,25 +51,20 @@ public class HSKController {
     // 로그인 id 가져오기
     @GetMapping("/touroview_insert")
     public String showTouroviewForm(HttpServletRequest request, Model model) {
-        
         // 세션에서 로그인 정보 가져오기
         HttpSession session = request.getSession();
         UserVO user = (UserVO) session.getAttribute("loggedInUser");
         String userId =  user.getUser_id();
-        
         // 로그인 여부 확인
         if (userId == null){
             // 로그인 안 된 경우 로그인 페이지 이동
             return "redirect:/user/login";
-        } 
-
+        }
         // TouroviewVO 객체에 설정
         TouroviewVO touroviewVO = new TouroviewVO();
         touroviewVO.setUser_id(userId);
-        
         // 모델에 추가
         model.addAttribute("touroviewVO", touroviewVO);
-
         // 로그인 된 경우 게시글 작성 폼 이동
         session.setAttribute("userId", userId);
         return "touroview/touroview_insert";
@@ -88,85 +76,59 @@ public class HSKController {
     // 후기 게시물 등록
     @PostMapping("/saveTouroview")
     public String saveTouroview(@ModelAttribute("touroviewVO") TouroviewVO touroviewVO, 
-                                HttpServletRequest request, Model model, 
+                                HttpServletRequest request,
                                 @RequestParam(name="files", required = false) MultipartFile[] files) {
+
+
             try{
-                // 여행 후기 데이터를 저장하는 서비스 메소드 호출
-
-                // 세션에서 로그인 정보 가져오기
-                HttpSession session = request.getSession();
-                String userId = (String) session.getAttribute("loggedId");
-
-                // 사용자 아이디 설정
-                touroviewVO.setUser_id(userId);
-
-                // 여행 후기 데이터 저장하는 서비스 메소드 호출
-                touroviewService.saveTouroview(touroviewVO);
-
-                // 게시물 번호
+                // 여행 후기 데이터 저장하는 서비스
+                touroviewService.saveTouroview(touroviewVO,request);
+                // 게시물 번호 완
                 int touroview_num = touroviewService.selectViewNum();
-
-                // 파일 업로드 처리
                 try {
-                    if (files != null && files.length > 0) {
-                        try{
-                            for (MultipartFile file : files) {
-                                // 각 파일에 대한 처리 로직 추가
-                                // 예를 들어, 파일을 저장하거나 다른 작업을 수행할 수 있습니다.
-                                String img_name = file.getOriginalFilename();
-                                String img_real_name = new MD5Generator(img_name).toString();
-            
-                                // 시스템으로 자동으로 잡아주는 경로 설정
-                                // 생성되는 폴더의 위치를 확인 후 추후 변경
-                                // => static 폴더 밑으로 이동해야 사용자가 그 파일에 접근 가능
-                                String save_path = System.getProperty("user.dir")+"\\src\\main\\resources\\static\\assets\\images\\touroviewImg";
-                                if( !new File(save_path).exists() ){
-                                    new File(save_path).mkdir();
-                                } 
-                                String img_path = save_path + "\\" + img_real_name;
-
-                                // 파일저장
-                            
-                                file.transferTo(new File(img_path));
-                                
-                                
-                                // 디비저장을 위해서 파일정보 덩어리 만들기
-                                ImgVO ivo = new ImgVO();
-                                ivo.setImg_name(img_name);
-                                ivo.setImg_real_name(img_real_name);
-                                ivo.setImg_path(img_path);
-
-                                imgService.insertFile(ivo);
-
-                                // 파일정보 img_detail에 담기
-                                ImgDetailVO idvo = new ImgDetailVO();
-                                // idvo.setUser_id(vo.getUser_id());
-                                idvo.setImg_num(imgService.selectNum());
-                                idvo.setTouroview_num(touroview_num);
-                                touroviewService.insertFileView(idvo);
+                    if(files != null && files.length > 0 ){
+                        for(MultipartFile file : files){
+                            if(!isValidFile(file)){
+                                return "error" ;
                             }
-                        }catch(Exception e) {
-                            System.out.println("file error" + e);
                         }
                     }
+                    imgService.insertFile(files); // service vo 를 처리 하지만 controller에선 files 임 -> files 값을 저장 및 처리 할 생각
+                    return "redirect:/touroview/touroview_detail?touroview_num=" + String.valueOf(touroview_num);
                 } catch (Exception e) {
-                        System.out.println("file2 error");
-                                
+                    e.printStackTrace();
+                    return "touroview/touroview_insert";
                 }
-
-
-                // 성공 시 리다이렉트
-                return "redirect:/touroview/touroview_detail?touroview_num=" + String.valueOf(touroview_num); // 저장 후 목록 페이지로 리다이렉트
             } catch (Exception e){
-                // 저장 중 오류 발생
                 e.printStackTrace();
                 return "touroview/touroview_insert";
             }
         }
 
-        
-    // ---------------------------------------------- touroivew_list
-    
+    private boolean isValidFile(MultipartFile file){
+        if(file.isEmpty()){
+            return false ;
+        }
+        String fileName = file.getOriginalFilename() ;
+        if(fileName == null){
+            return false ;
+        }
+        String lowerFileName = fileName.toLowerCase();
+        List<String> blockedExtensions = Arrays.asList(".exe", ".sh", ".bat", ".js", ".php", ".jsp", ".html", ".dll", ".scr");
+        for( String ext : blockedExtensions){
+            if(lowerFileName.endsWith(ext)){
+                return false ;
+            }
+        }
+        // 파일 크기 제한 (ex: 10MB 이상 업로드 방지)
+//        long maxFileSize = 10 * 1024 * 1024;  // 10MB
+//        if (file.getSize() > maxFileSize) {
+//            return false;
+//        }
+
+        return true ;
+    }
+
     // 페이징 및 list 목록 조회
     @GetMapping("/touroview_list")
     public String showTouroviewList(Model model,

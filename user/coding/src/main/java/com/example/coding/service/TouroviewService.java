@@ -2,6 +2,7 @@ package com.example.coding.service;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +23,7 @@ public interface TouroviewService {
     public List<TourVO> findByKeyword(TourVO vo);
     
     // 후기 게시판 작성 후 db 저장
-    public void saveTouroview(TouroviewVO touroviewVO);
+    public void saveTouroview(TouroviewVO touroviewVO, HttpServletRequest request);
 
     
     // ------------------------------ touroview_list 

@@ -56,48 +56,31 @@ public class UserController {
             // 파일첨부가 있는 경우
             if( file != null && !file.isEmpty() ){
                 String img_name = file.getOriginalFilename();
-                System.out.println("originFilename : " + img_name);
                 String img_real_name = new MD5Generator(img_name).toString();
-
-                // 시스템으로 자동으로 잡아주는 경로 설정
-                // 생성되는 폴더의 위치를 확인 후 추후 변경
-                // => static 폴더 밑으로 이동해야 사용자가 그 파일에 접근 가능
                 String save_path = System.getProperty("user.dir")+"\\src\\main\\resources\\static\\assets\\images\\profile";
                 if( !new File(save_path).exists() ){
                     new File(save_path).mkdir();
                 } 
                 String img_path = save_path + "\\" + img_real_name;
-                System.out.println("filepath : " + img_path);
-
-                // 파일저장
                 file.transferTo(new File(img_path));
-                
-                // 디비저장을 위해서 파일정보 덩어리 만들기
                 ImgVO ivo = new ImgVO();
 								ivo.setImg_name(img_name);
                 ivo.setImg_real_name(img_real_name);
                 ivo.setImg_path(img_path);
-                System.out.println("<<<<< 파일정보 덩어리 만들기 성공 >>>>>");
-
-                imgService.insertFile(ivo);
-                System.out.println("insertFile() 요청");
 
                 // 파일정보 img_detail에 담기
                 ImgDetailVO idvo = new ImgDetailVO();
                 idvo.setUser_id(vo.getUser_id());
                 idvo.setImg_num(imgService.selectNum());
-                System.out.println("아이디 : "+idvo.getUser_id()+"이미지번호 : "+idvo.getImg_num());
 
                 // 디비저장 시 파일정보 덩어리 추가
 				userService.insertUser(vo, ivo, idvo);
-				System.out.println("insertUser() 요청");
             }else {
                 // 파일첨부가 없는 경우
                 // 기본 이미지를 업로드할 수 있도록 경로 설정
                 String defaultImg_real_name = new MD5Generator(defaultProfileImagePath).toString();
                 String save_path = System.getProperty("user.dir") + "\\src\\main\\resources\\";
                 String img_path = save_path + defaultProfileImagePath;
-                System.out.println("img_path : " + img_path);
 
                 // 기본 이미지 저장
                 InputStream defaultImageStream = getClass().getClassLoader().getResourceAsStream(defaultProfileImagePath);
@@ -108,8 +91,7 @@ public class UserController {
                 ivo.setImg_name("default_profile.png");
                 ivo.setImg_real_name(defaultImg_real_name);
                 ivo.setImg_path(img_path);
-                imgService.insertFile(ivo);
-    
+
                 // 파일정보 img_detail에 담기
                 ImgDetailVO idvo = new ImgDetailVO();
                 idvo.setUser_id(vo.getUser_id());
@@ -121,7 +103,6 @@ public class UserController {
 			return "redirect:login";
         }catch(Exception ex){
             ex.printStackTrace();
-            System.out.println("파일업로드 실패 : " + ex.getMessage());
             return "redirect:/errorPage"; // 실패 시 처리할 페이지로 리다이렉트
         }
 		

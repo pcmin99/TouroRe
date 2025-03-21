@@ -91,72 +91,9 @@ public class TouroMateController {
     @PostMapping("/register-course")
     public String registerCourse(@ModelAttribute TouroMateVO touroMateVO, 
                                 HttpServletRequest request, @RequestParam(name="files", required = false) MultipartFile[] files){
-        //세션에서 user_id 가져오기
-        HttpSession session = request.getSession();
-        System.out.println("=========" + session);
-        UserVO loggedInUser = (UserVO) session.getAttribute("loggedInUser");
-        System.out.println("userId:" + loggedInUser);
-        touroMateVO.setUser_id(loggedInUser.getUser_id());
-        mateService.registerTouroMateAndChat(touroMateVO);
-        mateService.joinChat(touroMateVO.getUser_id(), touroMateVO.getTouro_mate_num(), null);
-
-        int touro_mate_num = mateService.selectMateNum();
-
-        // 파일 업로드 처리
-        try {
-        if (files != null && files.length > 0) {
-            try{
-                for (MultipartFile file : files) {
-                    // 각 파일에 대한 처리 로직 추가
-                    // 예를 들어, 파일을 저장하거나 다른 작업을 수행할 수 있습니다.
-                    String img_name = file.getOriginalFilename();
-                    System.out.println("originFilename : " + img_name);
-                    String img_real_name = new MD5Generator(img_name).toString();
-
-                    // 시스템으로 자동으로 잡아주는 경로 설정
-                    // 생성되는 폴더의 위치를 확인 후 추후 변경
-                    // => static 폴더 밑으로 이동해야 사용자가 그 파일에 접근 가능
-                    String save_path = System.getProperty("user.dir")+"\\src\\main\\resources\\static\\assets\\images\\touromateImg";
-                    if( !new File(save_path).exists() ){
-                        new File(save_path).mkdir();
-                    } 
-                    String img_path = save_path + "\\" + img_real_name;
-                    System.out.println("filepath : " + img_path);
-
-                    // 파일저장
-                
-                    file.transferTo(new File(img_path));
-                    
-                    
-                    // 디비저장을 위해서 파일정보 덩어리 만들기
-                    ImgVO ivo = new ImgVO();
-                    ivo.setImg_name(img_name);
-                    ivo.setImg_real_name(img_real_name);
-                    ivo.setImg_path(img_path);
-                    System.out.println("<<<<< 파일정보 덩어리 만들기 성공 >>>>>");
-
-                    imgService.insertFile(ivo);
-                    System.out.println("insertFile() 요청");
-
-                    // 파일정보 img_detail에 담기
-                    ImgDetailVO idvo = new ImgDetailVO();
-                    // idvo.setUser_id(vo.getUser_id());
-                    idvo.setImg_num(imgService.selectNum());
-                    idvo.setTouro_mate_num(touro_mate_num);
-                    System.out.println(idvo.getTouro_mate_num());
-                    mateService.insertFileMate(idvo);
-                    System.out.println("아이디 : "+idvo.getTouro_mate_num()+"이미지번호 : " + idvo.getImg_num());
-
-                }
-            }catch(Exception e) {
-                System.out.println("file error" + e);
-            }
-        }
-    } catch (Exception e) {
-            System.out.println("file2 error");
-                    
-    }
-
+        mateService.registerTouroMateAndChat(touroMateVO, request);
+        mateService.joinChat(touroMateVO.getUser_id(), touroMateVO.getTouro_mate_num(), null); // 아직 안건듬
+        imgService.insertFile(files);
         return "redirect:/touromate/touromate_list";
 
     }

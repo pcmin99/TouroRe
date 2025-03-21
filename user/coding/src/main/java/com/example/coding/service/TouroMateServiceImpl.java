@@ -2,6 +2,8 @@ package com.example.coding.service;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -98,7 +100,11 @@ public class TouroMateServiceImpl implements TouroMateService {
 
     @Transactional
     @Override
-    public void registerTouroMateAndChat(TouroMateVO touroMateVO) {
+    public void registerTouroMateAndChat(TouroMateVO touroMateVO, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        UserVO loggInUSer = (UserVO) session.getAttribute("loggedInUser");
+        touroMateVO.setUser_id(loggInUSer.getUser_id());
+
         TouromateDAO.registerTouroMateAndChat(touroMateVO);
         TouromateDAO.registerTouroMateChat(touroMateVO);
     }

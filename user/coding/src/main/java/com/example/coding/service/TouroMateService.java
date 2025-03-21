@@ -2,6 +2,7 @@ package com.example.coding.service;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -36,7 +37,7 @@ public interface TouroMateService {
     UserVO getAuthorInfo(String user_id);
 
     // 여행친구찾기와 채팅 테이블에 값 동시에 저장하는 메서드
-    void registerTouroMateAndChat(TouroMateVO touroMateVO);
+    void registerTouroMateAndChat(TouroMateVO touroMateVO, HttpServletRequest request);
 
     // 해당 사용자가 특정 채팅방에 이미 있는지 확인하는 메서드
     int checkUserInChat(String user_id, String chat_num);

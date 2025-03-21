@@ -1,6 +1,5 @@
 package com.example.coding.controller;
 
-import java.io.File;
 import java.util.List;
 
 import com.example.coding.domain.*;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.coding.dao.AdminRepository;
 import com.example.coding.dao.AdminUserRepository;
 import com.example.coding.service.AdminService;
-import com.example.coding.util.MD5Generator;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -98,23 +96,18 @@ public class AdminController {
 }
 
 
-    // 전체 회원 전체 리스트 띄우는 컨트롤러 (My batis)
+    // 일단 로직 service단에 던짐
+    // 어차피 List 값 서비스 단에 던진 후 리턴 받아서 모델이 붙이기에 로직 이동
     @GetMapping("/user/userList")
     public List<AdminUserVO> userList(Model m) {
         List<AdminUserVO> userlist = adminService.userList();
-        for(AdminUserVO user : userlist){
-            if(user.getImgRealName() != null) {
-                String path = "../../../../user/coding/src/main/resources/static/assets/images/profile/";
-                String realName = user.getImgRealName();
-            }
-        }
         m.addAttribute("userList", userlist);
         return userlist;
     }
 
     // 유저 목록 페이지 내부에 search 값 리스트 띄우는 컨트롤러 (JPA)
     @GetMapping("/user/userSearch")
-    public List<AdminUserJpaVO> searchUsers(@RequestParam("userSearch") String userSearch, Model m) {
+    public List<AdminUserJpaVO> searchUsers(@RequestParam("userSearch") String userSearch) {
         return userRepo.findByUserSearchLike("%" + userSearch + "%");
     }
 
