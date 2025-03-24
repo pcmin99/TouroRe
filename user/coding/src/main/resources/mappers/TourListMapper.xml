@@ -4,6 +4,15 @@
 
 <mapper namespace="com.example.coding.dao.TourListDAO">
 
+
+<!-- order by tour_star 에서 tour_num으로 변경
+	별점 기반 정렬을 구현된 기능이며
+	db 에서 index 사용을 위해 tour_star 생성도 고민했지만
+	별점은 자주 바뀌는 값이라고 생각되어 -> primary key로 order 변경
+	1. 데이터가 어느정도 있는 상황에서 번호가 바뀔 확률 X
+	2. 생성되더라도 가장 적게 생성될 확률
+	3. explain으로 index 사용하는 것 확인 완료
+-->
 <select id="selectAll" resultType="com.example.coding.domain.TourVO" parameterType="com.example.coding.domain.Search">
 	SELECT *
 	FROM tour 
@@ -33,9 +42,10 @@
 		)
 		</if>
 	</trim>
-	ORDER BY tour_star DESC
+	ORDER BY tour_num DESC
 	LIMIT #{startList}, #{listSize}
 </select>
+
 
 <select id="tourListCnt" resultType="int" parameterType="com.example.coding.domain.Search">
 		SELECT count(*) as listCnt
@@ -67,16 +77,19 @@
 		</trim>
 </select>
 
+<!--index 타입 const으로 확인 완료	-->
 <select id="selectOne" resultType="com.example.coding.domain.TourVO" parameterType="com.example.coding.domain.TourVO">
 	SELECT * 
 	FROM tour 
 	WHERE tour_num=#{tour_num} 
 </select>
 
+
 <insert id="addWishListById" parameterType="com.example.coding.domain.WishListVO">
 	INSERT INTO wishlist (user_id, tour_num)
 	VALUES (#{user_id}, #{tour_num})
 </insert>
+
 
 <select id="ckWishListById" resultType="int" parameterType="com.example.coding.domain.WishListVO">
 	SELECT * 

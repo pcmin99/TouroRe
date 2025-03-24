@@ -12,11 +12,16 @@
 	<select id="tourList" resultType="AdminTourVO">
 		SELECT tour_name tourName, tour_num tourNum
 		FROM tour
+		order by tour_num
 	</select>
 	
 	<!-- 여행지 디테일 페이지
 	VO 교체 O
 	db explain 확인 O
+	index type =>
+	t = const
+	id = ref
+	ig = eq_ref
 	-->
 	<select id="tourdetail" parameterType="AdminTourDetailVO" resultType="AdminTourDetailVO">
 		SELECT
@@ -44,10 +49,14 @@
 		INSERT INTO tour (tour_name, tour_addr, tour_content, tour_site_addr, tour_img1_path)
 		VALUES (#{tour_name}, #{tour_addr}, #{tour_content}, #{tour_site_addr}, #{tour_img1_path})
 	</insert>
-	
+
+
 	<!--유저 리스트
 	 VO 변경 완
-
+	index type =>
+	u = index
+	imgde = ref
+	i = eq_ref
 	 -->
 	<select id = "userList" parameterType="AdminUserVO" resultType="AdminUserVO">
 		SELECT
@@ -70,11 +79,13 @@
 		LEFT JOIN
 			`img` i ON imgde.img_num = i.img_num
 		WHERE u.admin_authority = 1;
+		order by u.user_id
 	</select>
 
 
 	<!-- 후기 게시판 리스트
 	JOIN 순서 리뷰 < 신고 < 여행지 < 좋아요
+	index 확인결과 tvw, rp,li 는 type all 임
 	-->
 	<select  id="touroviewList" parameterType="AdminTouroViewList" resultType="AdminTouroViewList">
 		SELECT distinct tvw.user_id user_id , 
@@ -92,7 +103,12 @@
 		LEFT  JOIN `like` li ON li.touroview_num = tvw.touroview_num
 	</select>
 
-	<!-- 후기 게시판 상세 디테일-->
+
+	<!-- 후기 게시판 상세 디테일
+		tvw = const
+		id 	= ref
+		ig	= eq_ref
+	-->
 	<select id = "touroViewNum" parameterType="Integer" resultType="AdminVO">
 		SELECT *
 		FROM touroview tvw
@@ -109,6 +125,7 @@
 		tr.tour_site_addr = #{tour_site_addr}
 	WHERE tr.tour_num = #{tourNum}
 	</update>
+
 
 	<!-- 후기 게시판 내부에서 검색
 	외부 검색 엔진 안쓸시
@@ -143,7 +160,16 @@
 			AGAINST(#{search_touroplus} in BOOLEAN MODE)
 	</select>
 
-	<!-- 푸터 가장 높은 별점 여행지 6개만 출력  O -->
+
+	<!--
+	푸터 가장 높은 별점 여행지 6개만 출력
+
+	 tour_star를 기반으로 인덱스 => tour_star 컬럼에 데이터로 인덱스 생성했지만
+	 해당 데이터는 tour_num 기반으로 정렬 되어 있음
+	 tour_star 컬럼을 단독으로 index 생성하지 않지만, tour_num과 함께 정렬하여 인덱스를 활용할 수 있음
+	 ORDER BY tour_star DESC이 최적화됨
+	 tour_num이 인덱스에 포함되어 있어 파일 정렬을 최소화하면서 데이터를 가져올 수 있음
+	 -->
 	<select id = "footer_tour_list" resultType="FooterTourListVO">
 	SELECT tour_num, tour_name, tour_img1_path
 	FROM `tour`
@@ -175,6 +201,8 @@
 	 Inqueiry-list = num, user_id, title, proces
 	 inqueiry detail = content, user_id tour_num, review_num 등등
 	 * = 모든것이 필요하고 모달 까지 정보를 넘겨야 하기에 해당 테이블 전체 SELECT
+
+	 index 사용을 위해 정렬절에 primary key 컬럼을 넣어주면서 자동 정렬 실행
 	 -->
 	<select id="inquiry" resultType="InquiryVO">
 		SELECT
@@ -182,6 +210,7 @@
 		iqr.inquiry_review_content inquiry_review_content
 		FROM `inquiry_review` iqr
 		JOIN `inquiry` iq ON  iq.inquiry_num = iqr.inquiry_num
+		order by iqr.inquiry_review_num
 	</select>
 
 </mapper>

@@ -48,7 +48,7 @@ public class TourPageController {
 	 * 	?page=&range=&listSize=&tour_cate_code=&keyword=&Locs=&Star=
 	 */
 	@RequestMapping(value = "/tour")
-	public String tourList(Model m ,@RequestParam(required = false, defaultValue = "1") int page 
+	public String tourList(Model m ,@RequestParam(required = false, defaultValue = "1") int page // 리스트 전체랑 사용자 검색 부분을 동시에 구현해서 
 							,@RequestParam(required = false, defaultValue = "1") int range 
 							,@RequestParam(required = false, defaultValue = "") String tour_cate_code 
 							,@RequestParam(required = false) String keyword
@@ -74,7 +74,6 @@ public class TourPageController {
 
 		search.pageInfo(page, range, listCnt);
 		m.addAttribute("paging", search);
-		System.out.println(search.toString());
 
 		List<TourVO> List = tourListService.getTourList(search);
 
@@ -89,8 +88,6 @@ public class TourPageController {
 	 */
 	@RequestMapping(value = "/{tour_num}", method = {RequestMethod.GET})
 	public ModelAndView tourDetail(TourVO vo,  HttpServletRequest request) {
-		System.out.println(vo.getTour_num());
-		System.out.println(vo.getLoc_cate_code());
 		ModelAndView m = new ModelAndView();
 		TourVO toutData = tourListService.getTourData(vo);
 		String referer = request.getHeader("Referer");
@@ -156,7 +153,6 @@ public class TourPageController {
 	@ResponseBody
 	public String deleteWishList(@ModelAttribute("vo") WishListVO vo){
 		int result = tourListService.deleteWishList(vo);
-		System.out.println(result);
 		if (result == 1) {
 			return "ok";
 		} else {
@@ -175,7 +171,6 @@ public class TourPageController {
 	@RequestMapping(value ="/inquiry", method={RequestMethod.POST})
 	@ResponseBody
 	public String newInquiry(@ModelAttribute("vo") InquiryVO vo) {
-		System.out.println(vo);
 		String res = tourListService.newInquiry(vo);
 		return res;
 	}
@@ -197,7 +192,6 @@ public class TourPageController {
 			JSONObject botAnser = new JSONObject();
 			botAnser.put("requestion", userStr);
 			botAnser.put("loginfo", userId);
-			System.out.println(botAnser.getAsString("requestion"));
             return botAnser.toString();
 
         } catch (Exception e) {
@@ -209,7 +203,6 @@ public class TourPageController {
 	@RequestMapping(value = "/getprofileImg", method={RequestMethod.POST})
 	@ResponseBody
 	public String requestMethodName(@ModelAttribute("vo") UserProfileVO vo) {
-		System.out.println(vo.getUser_id());
 		vo = userInfoService.getProfile(vo);
 		// null 값 경우 default_profile.png 반환
 		try {
