@@ -42,14 +42,18 @@
             WHERE user_id = #{user_id}
 	</select>
 
-      <!-- 아이디 찾기 -->
+      <!-- 아이디 찾기
+        explain => type = ref
+      -->
       <select id='findUserid' parameterType="String" resultType="String">
             SELECT user_id
             FROM USER
             WHERE user_email = #{user_email}
 	</select>
 
-      <!-- 인증메일 발송을 위한 사용자 체크 -->
+      <!-- 인증메일 발송을 위한 사용자 체크
+        explain => type = ref
+      -->
 	<select id='selectUser' parameterType="String" resultType="UserVO">
             SELECT *
             FROM USER

@@ -5,15 +5,4 @@
 <!-- *************************** dao interface 경로+이름 -->
 <mapper namespace="com.example.coding.dao.TourDAO">
 
-
-
-
-
-
-
-
-
-
-
-  
 </mapper>

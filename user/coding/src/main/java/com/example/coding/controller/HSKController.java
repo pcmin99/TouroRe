@@ -78,8 +78,6 @@ public class HSKController {
     public String saveTouroview(@ModelAttribute("touroviewVO") TouroviewVO touroviewVO, 
                                 HttpServletRequest request,
                                 @RequestParam(name="files", required = false) MultipartFile[] files) {
-
-
             try{
                 // 여행 후기 데이터 저장하는 서비스
                 touroviewService.saveTouroview(touroviewVO,request);
@@ -120,12 +118,6 @@ public class HSKController {
                 return false ;
             }
         }
-        // 파일 크기 제한 (ex: 10MB 이상 업로드 방지)
-//        long maxFileSize = 10 * 1024 * 1024;  // 10MB
-//        if (file.getSize() > maxFileSize) {
-//            return false;
-//        }
-
         return true ;
     }
 
@@ -176,20 +168,13 @@ public class HSKController {
         
         // 페이지 범위를 넘어가지 않도록 처리
         currentPage = Math.min(currentPage, touroviewPage);
-        
-        int startIndex = (currentPage - 1) * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, totalSearchCount);
 
         List<TouroviewVO> touroviewList = touroviewService.searchTouroviewList(keyword, currentPage, pageSize);
         model.addAttribute("touroviewList", touroviewList);
         model.addAttribute("keyword", keyword);
         model.addAttribute("touroviewPage", touroviewPage);
-        model.addAttribute("currentPage", currentPage);                                   
- 
-
-         return "touroview/touroview_list";
-
-     
+        model.addAttribute("currentPage", currentPage);
+        return "touroview/touroview_list";
      } 
 
 
@@ -208,10 +193,6 @@ public class HSKController {
     }
 
 
-
-
-
-
      // 인기 게시물
      @GetMapping("/popular")
      public ResponseEntity<List<LikeVO>> getPopularTouroview() {
@@ -219,16 +200,13 @@ public class HSKController {
         return ResponseEntity.ok(popularTouroview);
     }
 
-
-
-
-
         
     // ---------------------------------------------- touroview_detail
     // 해당 사용자가 작성한 게시글 불러오기 (detail 페이지)
     @GetMapping("/touroview_detail")
     public String showTouroviewDetail(@RequestParam(name = "touroview_num") int touroview_num, Model model, HttpSession session) {
             TouroviewVO touroviewVO = touroviewService.getTouroviewById(touroview_num);
+            model.addAttribute("touroviewVO", touroviewVO);
 
             // 후기 정보가 없을 경우 목록 페이지로 리다이렉트
             if (touroviewVO == null){
@@ -250,22 +228,23 @@ public class HSKController {
             
 
             // 우편번호 000000 처리
-            String postNum = tourVO.getTour_postnum().replaceAll("\\.0$", "");
-            tourVO.setTour_postnum(postNum); // tourVO에 postNum 넣기
+            String postNum = tourVO.getTour_postnum();
+            if (postNum == null) {
+                postNum = "default"; // 기본값 설정
+            } else {
+                postNum = postNum.replaceAll("\\.0$", "");
+            }
+            tourVO.setTour_postnum(postNum);
 
-            UserVO userVO = touroviewService.getUserByTouroviewId(touroview_num);
+
+            //UserVO userVO = touroviewService.getUserByTouroviewId(touroview_num);
             TouroviewReviewVO touroviewReviewVO = (TouroviewReviewVO) model.getAttribute("touroviewReviewVO"); //touroviewReview
 
 
             // 모델에 데이터 추가
-            model.addAttribute("touroviewVO", touroviewVO);
             model.addAttribute("tourVO", tourVO);
-            model.addAttribute("userVO", userVO);
 
             return "touroview/touroview_detail";
-            // touroviewNum에 해당하는 후기를 서비스를 통해 불러와서 모델에 추가
-            
-        
     }
         
 
@@ -273,7 +252,6 @@ public class HSKController {
     @ResponseBody
     public void report(TouroviewVO touroviewVO) {
         touroviewService.insertReportCount(touroviewVO);
-
     }
     
         
@@ -301,67 +279,6 @@ public class HSKController {
         }
         
     }
-    // // 수정
-    // @PostMapping("/touroview_update_delete")
-    // public String handleUpdateDeleteAction(@ModelAttribute TouroviewVO touroviewVO,
-    //                                         @RequestParam("files") MultipartFile[] files,
-    //                                         RedirectAttributes redirectAttrs){
-    //     try {
-
-    //         touroviewService.updateTouroview(touroviewVO);
-
-    //         // 파일 업로드 처리 ImgVO 정보 업데이트
-    //         for (MultipartFile file : files) {
-    //             if (!file.isEmpty()) {
-    //                 // 파일 저장 로직 구현 (여기서는 가상의 메소드 saveFile을 호출)
-    //                 String filePath = saveFile(file);
-    //                 String fileName = file.getOriginalFilename();
-    
-    //                 // ImgVO 객체 생성 및 설정
-    //                 ImgVO imgVO = new ImgVO();
-    //                 imgVO.setTouroview_num(touroviewVO.getTouroview_num()); // 게시물 번호 설정
-    //                 imgVO.setImg_name(fileName); // 파일 이름 설정
-    //                 imgVO.setImg_path(filePath); // 파일 경로 설정
-    
-    //                 // 데이터베이스에 이미지 정보 업데이트
-    //                 touroviewService.UpdateImgDetail(imgVO);
-    //             }
-    //         }
-
-    //         redirectAttrs.addFlashAttribute("successMessage", "게시물이 성공적으로 수정되었습니다.");
-    //         return "redirect:/touroview/touroview_list";
-    //     } catch (Exception e) {
-    //         // 필요한 대로 예외 처리
-    //         e.printStackTrace();
-    //         redirectAttrs.addFlashAttribute("errorMessage", "게시물 수정 중 오류가 발생했습니다.");
-    //         return "redirect:/touroview/touroview_update_delete?touroview_num=" + touroviewVO.getTouroview_num();
-    //     }
-
-    // }
-
-
-    // // 파일을 저장하고 저장된 파일의 경로를 반환하는 메서드
-    // private String saveFile(MultipartFile file) throws IOException {
-    //     // 저장할 디렉토리 경로 설정 (이 경로는 실제 서버 환경에 맞게 설정해야 함)
-    //     String uploadDir = "여기에_파일을_저장할_서버_경로를_지정";
-
-    //     // 파일명 생성 로직 (중복 방지를 위해 시스템 시간을 활용할 수 있음)
-    //     String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-
-    //     // 파일 저장 경로 생성
-    //     Path savePath = Paths.get(uploadDir + File.separator + fileName);
-
-    //     // 파일 저장
-    //     Files.copy(file.getInputStream(), savePath, StandardCopyOption.REPLACE_EXISTING);
-
-    //     // 저장된 파일의 전체 경로를 문자열로 반환
-    //     return savePath.toString();
-    // }
-    
-
-
-
-
 
     // 후기 게시물 삭제
     @PostMapping("/deleteTouroview")

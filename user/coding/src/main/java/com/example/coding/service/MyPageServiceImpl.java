@@ -46,13 +46,16 @@ public class MyPageServiceImpl implements MyPageService {
     // 사용자가 작성한 리뷰 개수 가져오기
     @Override
     public int getTouroviewCountByUserId(String userId){
+
         return myPageDAO.getTouroviewCountByUserId(userId);
     }
+
     // 여행지 리뷰 개수 가져오기
     @Override
     public int getTourReviewCountByUserId(String userId){
         return myPageDAO.getTourReviewCountByUserId(userId);
     }
+
     // 여행지 후기 리뷰 개수 가져오기
     @Override
     public int getTouroviewReviewCountByUserId(String userId){

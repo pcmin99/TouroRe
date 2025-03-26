@@ -56,14 +56,12 @@ public interface TouroviewDAO {
     // 여행지 번호를 이용하여 해당 여행지 정보를 가져오기
     public TourVO getTourByTouroviewId(int touroview_num);
     
-    // 작성자(사용자) 정보 가져오기
-    public UserVO getUserByTouroviewId(int touroview_num);
-    
+
     // 후기 게시물 리뷰 정보 가져오기
     public TouroviewReviewVO getTouroviewReviewByTouroviewId(int touroview_num);
 
     // 작성자 정보
-    public UserVO getUserById(String userId);
+    // public UserVO getUserById(String userId);
 
     
 

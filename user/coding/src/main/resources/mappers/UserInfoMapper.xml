@@ -5,10 +5,21 @@
 
 <mapper namespace="com.example.coding.dao.UserInfoDAO">
 
+<!--
+explain => type = ALL
+user_id info 값임
+모든 컬럼을 index 처리 하자니 중첩 값이 많고
+-->
 <select id="selectUser" parameterType="com.example.coding.domain.UserVO" resultType="com.example.coding.domain.UserVO">
 	SELECT * FROM user WHERE user_id = #{user_id}
 </select>
 
+
+<!--
+user a			explain => type = index
+img_detail b	explain => type = ref
+img c			explain => type = eq_ref
+-->
 <select id="getProfile" parameterType="com.example.coding.domain.UserProfileVO" resultType="com.example.coding.domain.UserProfileVO">
 SELECT c.img_real_name
 FROM user a JOIN img_detail b ON a.user_id = b.user_id

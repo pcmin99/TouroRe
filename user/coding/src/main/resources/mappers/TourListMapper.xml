@@ -11,7 +11,8 @@
 	별점은 자주 바뀌는 값이라고 생각되어 -> primary key로 order 변경
 	1. 데이터가 어느정도 있는 상황에서 번호가 바뀔 확률 X
 	2. 생성되더라도 가장 적게 생성될 확률
-	3. explain으로 index 사용하는 것 확인 완료
+
+	explain => type = index
 -->
 <select id="selectAll" resultType="com.example.coding.domain.TourVO" parameterType="com.example.coding.domain.Search">
 	SELECT *
@@ -77,7 +78,9 @@
 		</trim>
 </select>
 
-<!--index 타입 const으로 확인 완료	-->
+<!--
+explain => type = const
+-->
 <select id="selectOne" resultType="com.example.coding.domain.TourVO" parameterType="com.example.coding.domain.TourVO">
 	SELECT * 
 	FROM tour 
@@ -90,7 +93,9 @@
 	VALUES (#{user_id}, #{tour_num})
 </insert>
 
-
+<!--
+explain => type = ref
+-->
 <select id="ckWishListById" resultType="int" parameterType="com.example.coding.domain.WishListVO">
 	SELECT * 
 	FROM wishlist 

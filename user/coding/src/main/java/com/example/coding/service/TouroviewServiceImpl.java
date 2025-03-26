@@ -139,13 +139,7 @@ public class TouroviewServiceImpl implements TouroviewService{
    public TourVO getTourByTouroviewId(int touroview_num){
         return touroviewDAO.getTourByTouroviewId(touroview_num); 
    }
-    
 
-    // 작성자(사용자) 정보 가져오기
-    @Override
-    public UserVO getUserByTouroviewId(int touroview_num){
-        return touroviewDAO.getUserByTouroviewId(touroview_num);
-    }
 
     // 후기 게시물 리뷰 정보 가져오기
     @Override
@@ -166,10 +160,10 @@ public class TouroviewServiceImpl implements TouroviewService{
     }
 
     // 작성자 정보
-    @Override
-    public UserVO getUserById(String userId) {
-        return touroviewDAO.getUserById(userId);
-    }
+//    @Override
+//    public UserVO getUserById(String userId) {
+//        return touroviewDAO.getUserById(userId);
+//    }
 
 
 
@@ -196,6 +190,7 @@ public class TouroviewServiceImpl implements TouroviewService{
     // 디테일 배경 이미지 가져오기
     @Override
     public TouroviewDetailVO getTouroviewImg(int tour_num) {
+
         return touroviewDAO.getTouroviewImg(tour_num);
     }
 

@@ -13,39 +13,55 @@
     WHERE   user_id = #{userId}
 </select>
 
-<!-- 사용자 프로필 사진 가져오기 -->
+
+<!-- 사용자 프로필 사진 가져오기
+img_detail imgDetail    explain => type = index
+img img                 explain => type = eq_ref
+
+ORDER BY imgDetail.img_detail_num 작성 사유
+    선행 테이블에 primary key 값으로 정렬 시키면서 자동으로 index 사용하기 위해 작성
+-->
 <select id="getUserProfileImage" resultType="String">
     SELECT  img.img_real_name
     FROM    img_detail imgDetail
-    JOIN    img ON imgDetail.img_num = img.img_num
+    JOIN    img img ON imgDetail.img_num = img.img_num
     WHERE   imgDetail.user_id = #{userId}
+    ORDER BY imgDetail.img_detail_num
 </select>
 
 
 <!-- ************************************************* -->
 <!-- 마이페이지 - 메인페이지 - 개수 -->
-<!-- 사용자가 작성한 리뷰 개수 조회 -->
+<!-- 사용자가 작성한 리뷰 개수 조회
+explain => type = index
+-->
 <select id="getTouroviewCountByUserId" resultType="int" parameterType="string">
     SELECT  COUNT(*)
     FROM    touroview
     WHERE   user_id = #{userId}
 </select>
 
-<!-- 사용자가 작성한 tour_review 댓글 개수 조회 -->
+<!-- 사용자가 작성한 tour_review 댓글 개수 조회
+explain => type = index
+-->
 <select id="getTourReviewCountByUserId" resultType="int" parameterType="string">
     SELECT  COUNT(*) 
     FROM    tour_review
     WHERE   user_id = #{userId}
 </select>
 
-<!-- 사용자가 작성한 touroview_review 댓글 개수 조회-->
+<!-- 사용자가 작성한 touroview_review 댓글 개수 조회
+explain => type = ref
+-->
 <select id="getTouroviewReviewCountByUserId" resultType="int" parameterType="string">
     SELECT  COUNT(*) 
     FROM    touroview_review
     WHERE   user_id = #{userId}
 </select>
 
-<!-- 사용자가 담은 여행지 개수 조회-->
+<!-- 사용자가 담은 여행지 개수 조회
+explain => type = index
+-->
 <select id="getTourWishCountByUserId" resultType="int" parameterType="string">
     SELECT  COUNT(*)
     FROM    wishlist
@@ -54,14 +70,18 @@
 
 
 <!-- 작성한 게시물 -->
-<!-- 여행 친구 -->
+<!-- 여행 친구
+ explain => type = ref
+ -->
 <select id="countTouroMate" resultType="int" parameterType="string">
     SELECT  COUNT(*) 
     FROM    touro_mate
     WHERE   user_id = #{userId}
 </select>
 
-<!-- 여행 후기 -->
+<!-- 여행 후기
+explain => type = indexc
+-->
 <select id="countTouroview" resultType="int" parameterType="string">
     SELECT  COUNT(*) 
     FROM    touroview
@@ -75,11 +95,14 @@
     WHERE   user_id = #{userId}
 </select>
 
-<!-- 나의 발자취 - 마커찍기 -->
+<!-- 나의 발자취 - 마커찍기
+explain => type = index
+-->
 <select id="getReceiptsByUserId" parameterType="String" resultType="ReceiptVO">
     SELECT receipt_name, receipt_business_addr
     FROM receipt 
     WHERE user_id = #{userId}
+    ORDER BY receipt_num
 </select>
 
 

@@ -17,7 +17,9 @@
                 )
     </insert>
     
-    <!-- img 테이블에 최근 img_num 값을 검색 -->
+    <!-- img 테이블에 최근 img_num 값을 검색
+    explain => type = index
+    -->
     <select id="selectNum" resultType="Long">
         SELECT img_num
         FROM img

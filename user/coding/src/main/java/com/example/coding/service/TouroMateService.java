@@ -64,7 +64,7 @@ public interface TouroMateService {
     public UserProfileVO getProfile(UserProfileVO vo);
 
     // 게시글 삭제
-    void deleteTouroMate(TouroMateVO vo);
+    void deleteTouroMate(TouroMateVO vo,HttpServletRequest request);
 
     // 좋아요 추가
     void addWishListmate(LikeVO vo);

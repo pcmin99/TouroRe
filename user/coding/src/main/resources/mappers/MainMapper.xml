@@ -5,7 +5,12 @@
 <mapper namespace="com.example.coding.dao.MainDAO">
 
 
-  <!-- 유저별 선호 지역 가져오기 - 3개 - ajax -->
+  <!-- 유저별 선호 지역 가져오기 - 3개 - ajax
+user u        explain => type = index
+locate loc1   explain => type = eq_ref
+locate loc2   explain => type = eq_ref
+locate loc3   explain => type = eq_ref
+  -->
   <select id="preferLoc" parameterType="UserVO" resultType="MainVO">
     SELECT
       loc1.loc_name AS user_prefer_loc1,
@@ -16,9 +21,8 @@
       JOIN loc_cate loc1 ON u.user_prefer_loc1 = loc1.loc_cate_code
       JOIN loc_cate loc2 ON u.user_prefer_loc2 = loc2.loc_cate_code
       JOIN loc_cate loc3 ON u.user_prefer_loc3 = loc3.loc_cate_code
-    WHERE
-      u.user_id = #{user_id}
-
+    WHERE u.user_id = #{user_id}
+    ORDER BY u.user_id
   </select>
 
 
@@ -79,7 +83,10 @@
     OR tour_num = #{tour_num4}
   </select>
 
-  <!-- 베스트 리뷰어 -->
+  <!-- 베스트 리뷰어
+  touroview         explain => type = ALL
+  touroview_review  explain => type = eq_ref
+  -->
   <select id="bestReviewer" resultType="MainVO">
     SELECT
       touroview.user_id AS user_id,
@@ -109,7 +116,7 @@
 
    <!-- 관리자 touromate 검색-->
 	<select  id="searchMate" parameterType="AdminTouroMateVO" resultType="AdminTouroMateVO">
-		SELECT tm.user_id user_id, 
+    SELECT tm.user_id user_id,
     tm.touro_mate_title touro_mate_title, 
     tm.touro_mate_content touro_mate_content,
     li.like_count like_count, 
@@ -130,7 +137,9 @@
 		WHERE tm.touro_mate_num = #{touro_mate_num}
   </select>
 
-  <!-- 관리자 대시보드 - 회원수 가져오기 -->
+  <!-- 관리자 대시보드 - 회원수 가져오기
+  USER    explain => type = index
+  -->
   <select id="userCount" resultType="Integer">
     SELECT count(*) FROM USER;
   </select>
@@ -140,7 +149,9 @@
     SELECT count(*) FROM touro_mate;
   </select>
 
-  <!-- 관리자 대시보드 - 후기 게시글 수 가져오기 -->
+  <!-- 관리자 대시보드 - 후기 게시글 수 가져오기
+  touroview   explain => type = index
+  -->
   <select id="reviewCount" resultType="Integer">
     SELECT count(*) FROM touroview;
   </select>
@@ -150,7 +161,11 @@
     SELECT count(*) FROM receipt;
   </select>
 
-  <!-- 관리자 대시보드 - 연령대 별 회원 수 통계 -->
+  <!-- 관리자 대시보드 - 연령대 별 회원 수 통계
+  explain => type = ALL
+  관리자 대시보드에 연령대별 int로 데이터 전송이기에
+  테이블 전체 select 이기에 index 사용 불가
+  -->
   <select id="getAgeUser" resultType="AdminVO">
     SELECT
       SUM(CASE WHEN USER.user_age BETWEEN 0 AND 19 THEN 1 ELSE 0 END) as age_0_19,
@@ -222,12 +237,16 @@
     LIMIT 4;
   </select>
 
-  <!-- 관리자 후기 게시판 신고 3번 이상 찾기 -->
+  <!-- 관리자 후기 게시판 신고 3번 이상 찾기
+  explain => type = ref
+  다만 데이터가 없기에 정확한 확인 불가이기에
+  primarykey 기준으로 order by
+  -->
   <select id="touroviewBlindCount" parameterType="Integer" resultType="Integer">
     SELECT count(*)
     FROM report
     WHERE touroview_num = #{tourview_num}
-
+    ORDER BY report_num
   </select>
 
   <!-- 관리자 후기 게시판 신고 3번 이상 게시글 블라인드 처리 -->
@@ -253,19 +272,26 @@
   </update>
 
 
-  <!-- 관리자 대시보드 - 인기 게시물 가져오기 -->
+  <!-- 관리자 대시보드 - 인기 게시물 가져오기
+tour t            explain => type = eq_ref
+touroview tv      explain => type = eq_ref
+like li           explain => type = ALL
+각 글마다 좋아요 수를 구해야 하기에 index를 자동으로 사용할 수가 없음
+  -->
   <select id="popularPost" resultType="AdminVO">
     SELECT tv.touroview_num, t.tour_name, tv.user_id, SUM(li.like_count) as like_count
     FROM touroview tv
     INNER JOIN tour t ON tv.tour_num = t.tour_num
     LEFT JOIN `like` li ON tv.touroview_num = li.touroview_num
-    LEFT JOIN report r ON tv.touroview_num = r.touroview_num
-    WHERE r.report_count = 0 OR r.report_count IS NULL AND like_count <![CDATA[>]]> 0
+    WHERE like_count <![CDATA[>]]> 0
     GROUP BY tv.touroview_num, t.tour_name, tv.user_id
     ORDER BY like_count DESC; 
   </select>
 
-  <!-- 관리자 대시보드 - 인기 여행지 가져오기 -->
+  <!-- 관리자 대시보드 - 인기 여행지 가져오기
+wishlist wl     explain => type = index
+tour t          explain => type = eq_ref
+  -->
   <select id="popularTour" resultType="AdminVO">
     SELECT t.tour_num tour_num, count(wl.tour_num) wish_count, t.tour_img1_path tour_img1_path, t.tour_name tour_name, t.tour_cate_name tour_cate_name
     FROM wishlist wl INNER JOIN tour t ON wl.tour_num = t.tour_num
@@ -274,7 +300,11 @@
     LIMIT 5;
   </select>
 
-  <!-- 관리자 대시보드 - 회원수 차트 값... -->
+  <!-- 관리자 대시보드 - 회원수 차트 값...\
+  user 테이블의  user_register_date 컬럼에 해당 index 생성
+  => 유저 가입일이 바뀌고,수정될 이유가 없기에 생성
+  explain => type = index
+   -->
   <select id="usercountGraph" resultType="ChartVO">
     SELECT DATE_FORMAT(user_register_date, '%y.%m') AS month,
 	    Count(DATE_FORMAT(user_register_date, '%y.%m')) AS count_month
@@ -286,7 +316,11 @@
         month
   </select>
 
-  <!-- 관리자 대시보드 - 여행후기 게시글 차트 값... -->
+  <!-- 관리자 대시보드 - 여행후기 게시글 차트 값...
+    touroview 테이블의  touroview_regdate 컬럼에 해당 index 생성
+  => 후기 등록일 바뀌고,수정될 이유가 없기에 생성
+  explain => type = index
+  -->
   <select id="touroviewCountGraph" resultType="ChartVO">
     SELECT DATE_FORMAT(touroview_regdate, '%y.%m') AS MONTH,
     Count(DATE_FORMAT(touroview_regdate, '%y.%m')) AS count_month
@@ -298,7 +332,9 @@
         MONTH;
   </select>
 
-  <!-- 관리자 대시보드 - 여행친구 찾기 게시글 차트 값... -->
+  <!-- 관리자 대시보드 - 여행친구 찾기 게시글 차트 값...
+  no data => no check
+  -->
   <select id="touromateCountGraph" resultType="ChartVO">
     SELECT DATE_FORMAT(touro_mate_date, '%y.%m') AS MONTH,
     Count(DATE_FORMAT(touro_mate_date, '%y.%m')) AS count_month
@@ -310,7 +346,9 @@
         MONTH;
   </select>
 
-  <!-- 관리자 대시보드 영수증 리뷰 그래프 -->
+  <!-- 관리자 대시보드 영수증 리뷰 그래프
+  no data => no check
+  -->
   <select id="receiptCountGraph">
     SELECT DATE_FORMAT(receipt_date, '%y.%m') AS MONTH,
     Count(DATE_FORMAT(receipt_date, '%y.%m')) AS count_month
@@ -328,7 +366,11 @@
     VALUES (#{user_id}, #{tour_num}, #{tour_review_content}, #{tour_review_star}, NOW()) 
   </insert>
 
-  <!-- 여행지 - 리뷰 가져오기 -->
+  <!-- 여행지 - 리뷰 가져오기
+  tour_review tr      explain => type = ref
+  img_detail idn      explain => type = ref
+  img i               explain => type = eq_ref
+  -->
   <select id="reviewSelect" parameterType="TourReviewVO" resultType="TourReviewVO">
     SELECT DISTINCT tr.*, i.*
     FROM   tour_review tr LEFT JOIN img_detail idn ON tr.user_id = idn.user_id
@@ -343,16 +385,27 @@
     VALUES (#{user_id}, #{touroview_num}, #{touroview_review_content}, #{touroview_review_star}, NOW(), #{tour_num}); 
   </insert>
 
-  <!-- 여행후기 게시판 - 리뷰 가져오기 -->
+  <!-- 여행후기 게시판 - 리뷰 가져오기
+  touroview_review tr      explain => type = ref
+  img_detail idn           explain => type = ALL
+  img i                    explain => type = eq_ref
+
+  detatil에 이미지가 필요한 테이블에 pk 전체가 fk로 들어가있기에 ALL
+  -->
   <select id="touroviewReviewSelect" parameterType="TouroviewReviewVO" resultType="TouroviewReviewVO">
     SELECT DISTINCT tr.*, i.*
-    FROM   touroview_review tr LEFT JOIN img_detail idn ON tr.user_id = idn.user_id
+    FROM   touroview_review tr
+    LEFT JOIN img_detail idn ON tr.user_id = idn.user_id
     LEFT JOIN img i ON idn.img_num = i.img_num
     WHERE  tr.touroview_num = #{touroview_num}
     ORDER BY tr.touroview_review_num DESC;
   </select>
 
-  <!-- 관리자 유저 상세정보 보기 -->
+  <!-- 관리자 유저 상세정보 보기
+  user       u        explain => type = const
+  img_detail imgde    explain => type = ref
+  img        i        explain => type = eq_ref
+  -->
   <select id='userListOne' parameterType="String" resultType="AdminVO">
     SELECT 	DISTINCT u.user_id userId, 
 		u.user_name userName, 

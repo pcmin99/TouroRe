@@ -73,11 +73,8 @@ public class TouroMateController {
             // 검색어가 있을 경우 실행 -> 조건에 맞는 게시글을 가져옴
             selectedMateList = mateService.searchMateList(searchKeyword, page);
         } else {
-            // 검색어가 없는 경우 -> 전체 게시글을 가져옴
             selectedMateList = mateService.getSelectedMateList(page);
         }
-
-        System.out.println("Search keyword: " + searchKeyword);
 
         m.addAttribute("touromates", selectedMateList);
         m.addAttribute("totalPages", getTotalPages);
@@ -91,6 +88,7 @@ public class TouroMateController {
     @PostMapping("/register-course")
     public String registerCourse(@ModelAttribute TouroMateVO touroMateVO, 
                                 HttpServletRequest request, @RequestParam(name="files", required = false) MultipartFile[] files){
+
         mateService.registerTouroMateAndChat(touroMateVO, request);
         mateService.joinChat(touroMateVO.getUser_id(), touroMateVO.getTouro_mate_num(), null); // 아직 안건듬
         imgService.insertFile(files);
@@ -112,7 +110,6 @@ public class TouroMateController {
         UserVO authorInfo = mateService.getAuthorInfo(touroMate.getUser_id());
 
         List<ImgVO> imgList = mateService.getImages(touro_mate_num);
-        System.out.println(imgList);
 
         int remainingUsers = mateService.getRemainingChatUsers(touro_mate_num);
 
@@ -135,15 +132,9 @@ public class TouroMateController {
         HttpSession session = request.getSession();
         UserVO loggedInUser = (UserVO) session.getAttribute("loggedInUser");
 
-        System.out.println("MATE "+touro_mate_num);
-
-
         try {
             if (loggedInUser != null) {
-                System.out.println("Joining chat for user: " + loggedInUser.getUser_id() + ", touro_mate_num: " + touro_mate_num);
-                // 채팅 참가하기 서비스 호출
                 String result = mateService.joinChat(loggedInUser.getUser_id(), touro_mate_num, null);
-                System.out.println("joinCHAT : " + result);
                 return result;
             } else {
                 return "로그인이 필요합니다.";
@@ -158,17 +149,13 @@ public class TouroMateController {
     @RequestMapping(value = "/getprofileImg", method={RequestMethod.POST})
    @ResponseBody
    public String requestMethodName(UserProfileVO vo) {
-      System.out.println("유저아이다>>>>>" + vo.getUser_id());
+
       vo = mateService.getProfile(vo);
-        System.out.println("vo : " + vo.getImg_real_name());
-      // null 값 경우 default_profile.png 반환
         String img_real_name = vo.getImg_real_name();
       try {
             if (vo.getImg_real_name() != null && vo.getImg_real_name() != "" && !img_real_name.equals("5ee25b671da2a46f118d0a4454d822a5")){
-                System.out.println("vo1213>>>>>>> : " + vo.getImg_real_name());
                 return img_real_name;
-                
-            }else return "NO";   
+            }else return "NO";
       } catch (Exception e) {
          return "default_profile.png";
       }
@@ -176,26 +163,14 @@ public class TouroMateController {
 
     // 게시글 삭제
     @PostMapping("/deleteTouroMate")
-    public ResponseEntity<String> deleteTouroMate(TouroMateVO vo, HttpServletRequest request, HttpSession session) {
-        // 세션에서 user_id 가져오기
-        UserVO loggedInUser = (UserVO) request.getSession().getAttribute("loggedInUser");
-        System.out.println("loggedInUser >>>  "+ loggedInUser.getUser_id());
-        String loggedInUserId = loggedInUser.getUser_id();
-
-        if(vo.getUser_id().equals(loggedInUserId)) {
-            mateService.deleteTouroMate(vo);
-            return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("게시물 삭제 권한이 없습니다.");
-        }
-
+    public void deleteTouroMate(TouroMateVO vo, HttpServletRequest request, HttpSession session) {
+        mateService.deleteTouroMate(vo,request);
     }
 
     // 좋아요 추가
     @PostMapping("/addWishListmate")
     @ResponseBody
    public void addWishList(@ModelAttribute("vo") LikeVO vo){
-        System.out.println("asas");
         mateService.addWishListmate(vo);
    }
 
@@ -203,24 +178,15 @@ public class TouroMateController {
     @PostMapping("/ckWishListmate")
     @ResponseBody
    public int ckWishList(@ModelAttribute("vo") LikeVO vo){
-      int res = mateService.ckWishListmate(vo);
-        System.out.println("Res값!!:>>>>>> " + res);
-      return res;
+      return mateService.ckWishListmate(vo);
    }
 
     // 좋아요 삭제
     @PostMapping("/deleteWishListmate")
     @ResponseBody
-   public String deleteWishList(@ModelAttribute("vo") LikeVO vo){
-      int result = mateService.deleteWishListmate(vo);
-        System.out.println("result >>>>!!! >>>> " + result);
-      System.out.println(result);
-      if (result == 1) {
-         return "ok";
-      } else {
-         return "no";
-      }
-      
+   public void deleteWishList(@ModelAttribute("vo") LikeVO vo){
+      mateService.deleteWishListmate(vo);
+
    }
 
 }

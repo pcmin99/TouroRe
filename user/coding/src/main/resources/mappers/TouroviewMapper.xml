@@ -5,7 +5,9 @@
 <!-- *************************** dao interface 경로+이름 -->
 <mapper namespace="com.example.coding.dao.TouroviewDAO">
 
-<!-- List-->
+<!-- List
+explain => type = const
+-->
 <select id="getTourByNum" parameterType="String" resultType="TourVO">
     SELECT  * 
     FROM    tour
@@ -35,7 +37,10 @@
     </where>
 </select>
 
-<!-- 인기 게시물 -->
+<!-- 인기 게시물
+like 수는 주기적으로 insert,update,delete 될 확률이 높으므로
+index를 사용해도 더 낮은 성능을 보일 것으로 예상
+-->
 <select id="getPopularTouroview" resultType="LikeVO">
     SELECT t.touroview_num, t.user_id, t.touroview_title, t.touroview_regdate, t.touroview_content, COUNT(l.like_num) as like_count
     FROM touroview t
@@ -57,7 +62,9 @@
     VALUES  (#{user_id}, #{tour_num}, #{touroview_title}, NOW(), NOW(), #{touroview_content});
 </insert>
   
-<!-- 여행친구찾기 이름 찾기 -->
+<!-- 여행친구찾기 이름 찾기
+explain => type = index
+-->
 <select id="selectViewNum" resultType="int">
     SELECT  touroview_num
     FROM    touroview
@@ -83,7 +90,9 @@
     HAVING COUNT(r.report_count) <![CDATA[<]]> 3;
 </select>
 
-<!-- 모든 페이지 수 가져오기-->
+<!-- 모든 페이지 수 가져오기
+explain => type = index
+-->
 <select id="getTotalPages" resultType="int">
     SELECT  COUNT(*)
     FROM    touroview;
@@ -96,7 +105,9 @@
     WHERE   tour_name LIKE CONCAT('%', #{keyword}, '%') OR tour_addr LIKE CONCAT('%', #{keyword}, '%');
 </select>
 
-<!-- TourVO에서 여행지 우편번호, 주소 받아오기 -->
+<!-- TourVO에서 여행지 우편번호, 주소 받아오기
+explain => type = const
+-->
 <select id="getTourById" resultType="TourVO">
     SELECT  *
     FROM    tour
@@ -109,7 +120,9 @@
     WHERE   user_id = #{userId}
 </select>
 
-<!-- detail (TouroviewVO) 페이지 -->
+<!-- detail (TouroviewVO) 페이지
+explain => type = const (선행, 후행 테이블 둘다)
+-->
 <select id="getTouroviewById" resultType="TouroviewVO">
     SELECT  * 
     FROM    touroview tvw
@@ -118,7 +131,10 @@
     WHERE   touroview_num = #{touroview_num}
 </select>
 
-<!-- 여행지 번호를 이용하여 해당 여행지(TourVO) 정보를 가져오기 -->
+
+<!-- 여행지 번호를 이용하여 해당 여행지(TourVO) 정보를 가져오기
+explain => type = const
+-->
 <select id="getTourByTouroviewId" resultType="TourVO">
     SELECT  * 
     FROM    tour 
@@ -132,7 +148,9 @@
     VALUES  (#{touroview_num}, #{user_id}, 1)
 </insert>
 
-<!-- 신고한 게시물인지 확인 -->
+<!-- 신고한 게시물인지 확인
+explain => type = ref
+-->
 <select id="checkReported" resultType="int">
     SELECT  COUNT(*)
     FROM    report
@@ -177,14 +195,21 @@
     WHERE   touroview_num = #{touroview_num}
 </delete>
 
-<!-- 디테일 게시물 기본 배경화면 가져오기 -->
+<!-- 디테일 게시물 기본 배경화면 가져오기
+tour t          explain  => type = const
+touroview t2    explain => type = ref
+-->
 <select id="getTouroviewImg" parameterType="int" resultType="TouroviewDetailVO">
     SELECT  * 
     FROM    tour t INNER JOIN touroview t2 ON t.tour_num = t2.tour_num 
     WHERE   t.tour_num = #{tour_num}
 </select>
 
-<!-- 디테일 게시물 여러 이미지 3개 가져오기 -->
+
+<!-- 디테일 게시물 여러 이미지 3개 가져오기
+img_detail id   explain => type = ref
+img i           explain => type = eq_ref
+-->
 <select id="detailviewImg" parameterType="int" resultType="TouroviewDetailVO">
     SELECT *
     FROM   img_detail id INNER JOIN img i ON id.img_num = i.img_num 
@@ -197,7 +222,9 @@
     VALUES  (#{touroview_num}, #{user_id}, '1', NULL)
 </insert>
 
-<!-- 좋아요 확인 -->
+<!-- 좋아요 확인
+explain => type = ref
+-->
 <select id="ckWishList" resultType="int" parameterType="LikeVO">
     SELECT  count(*) 
     FROM `like` 
@@ -210,7 +237,9 @@
     WHERE user_id = #{user_id} AND touroview_num = #{touroview_num}
 </delete>
 
-<!-- Touroview 에서 tour 가져오기-->
+<!-- Touroview 에서 tour 가져오기
+explain => type = const
+-->
 <select id="getTourNameByTourNum" parameterType="String" resultType="TourVO">
     SELECT  * 
     FROM    tour 

@@ -68,12 +68,11 @@ public class MyPageController {
         model.addAttribute("touroviewCount", touroviewCount); 
 
         // 여행지 댓글 개수 가져오기
-        int tourReviewCount = myPageService.getTourReviewCountByUserId(userId);
-        model.addAttribute("tourReviewCount", tourReviewCount); 
-
-        // 리뷰 개수 가져오기
+        int tourReviewCount1 = myPageService.getTourReviewCountByUserId(userId);
         int touroviewReviewCount = myPageService.getTouroviewReviewCountByUserId(userId);
-        model.addAttribute("touroviewReviewCount", touroviewReviewCount); 
+
+        int tourReviewCount = tourReviewCount1+touroviewReviewCount ;
+        model.addAttribute("tourReviewCount", tourReviewCount);
 
         // 여행지 담은 개수 가져오기
         int touroWishCount = myPageService.getTourWishCountByUserId(userId);
@@ -93,10 +92,6 @@ public class MyPageController {
         // 나의 발자취 게시물 개수
         int countReceipt = myPageService.countReceipt(userId);
         model.addAttribute("receiptCount", countReceipt);
-
-
-        
-    
 
         // ------------------------------------------------------------------
         // 마이페이지 - 작성한 글
@@ -184,12 +179,7 @@ public class MyPageController {
         model.addAttribute("totalInquiryListPages", totalInquiryListPages);
         model.addAttribute("InquiryCurrentPage", inquiryPage);
 
-
-
-        
-
         return "user/mypage";
-
 
     }
 
@@ -299,16 +289,10 @@ public class MyPageController {
 
         // 사용자 정보 가져와서 userVO에 저장
         UserVO userVO = myPageService.getUserProfile(userId);
-
         // 모델에 사용자 아이디 추가
         model.addAttribute("userId", userId); // 세션 id 값
-
         // UserVO
         model.addAttribute("userVO", userVO);
-
-        // 콘솔 출력
-        System.out.println("사용자 아이디: " + userId);
-        System.out.println("사용자 아이디: " + userVO);
 
         return "user/user/appReview";
 
