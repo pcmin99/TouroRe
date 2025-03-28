@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.coding.domain.ImgVO;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -33,6 +34,7 @@ public class ImgServiceImpl implements ImgService {
 
     // catch 부분을 어떻게 처리할 것인지 고민해야함 -> 트래픽 처리를 위해
     // 예외 상황 발생시 예외를 JSON데이터로 변환하여 프론트에 에러 도출( 에러 화면 제작 or alert 띄우는등 방식
+    @Transactional
     @Override
     public void insertFile(MultipartFile[] files ){
 

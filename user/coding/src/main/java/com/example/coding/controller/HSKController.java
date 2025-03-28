@@ -240,7 +240,6 @@ public class HSKController {
             //UserVO userVO = touroviewService.getUserByTouroviewId(touroview_num);
             TouroviewReviewVO touroviewReviewVO = (TouroviewReviewVO) model.getAttribute("touroviewReviewVO"); //touroviewReview
 
-
             // 모델에 데이터 추가
             model.addAttribute("tourVO", tourVO);
 
@@ -260,7 +259,6 @@ public class HSKController {
     // 후기 게시물 수정
     @GetMapping("/touroview_update_delete")
     public String updateTouroview(@RequestParam(name = "touroview_num") int touroviewNum,  Model model) {
-        
         try{
             // 수정 삭제 페이지에 필요한 데이터 가져오기
             TouroviewVO touroviewVO = touroviewService.getTouroviewById(touroviewNum);
@@ -269,12 +267,9 @@ public class HSKController {
             // TourVO 데이터 가져오기
             TourVO tourVO = touroviewService.getTourNameByTourNum(touroviewVO.getTour_num());
             model.addAttribute("tourVO", tourVO);
-            
-            return "touroview/touroview_update_delete";
 
+            return "touroview/touroview_update_delete";
         }catch (Exception e){
-            // 오류 처리
-            e.printStackTrace();
             return "redirect:/touroview/touroview_list";
         }
         
@@ -282,15 +277,8 @@ public class HSKController {
 
     // 후기 게시물 삭제
     @PostMapping("/deleteTouroview")
-    public ResponseEntity<String> deleteTouroview(@RequestParam(name = "touroviewNum") int touroviewNum) {
-        try {
+    public void deleteTouroview(@RequestParam(name = "touroviewNum") int touroviewNum) {
             touroviewService.deleteTouroview(touroviewNum);
-            return ResponseEntity.ok("삭제가 완료되었습니다.");
-        } catch (Exception e) {
-            // 삭제 실패 시 예외 처리와 함께 오류 응답을 반환
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류가 발생했습니다.");
-        }
     }
 
 
@@ -306,21 +294,15 @@ public class HSKController {
     @PostMapping("/ckWishList")
     @ResponseBody
 	public int ckWishList(@ModelAttribute("vo") LikeVO vo){
-		int res = touroviewService.ckWishList(vo);
-		return res;
+		return touroviewService.ckWishList(vo);
 	}
 
     // 좋아요 삭제
     @PostMapping("/deleteWishList")
     @ResponseBody
-	public String deleteWishList(@ModelAttribute("vo") LikeVO vo){
-		int result = touroviewService.deleteWishList(vo);
-		if (result == 1) {
-			return "ok";
-		} else {
-			return "no";
-		}
-		
+	public void deleteWishList(@ModelAttribute("vo") LikeVO vo){
+		touroviewService.deleteWishList(vo);
+
 	}
   
 }

@@ -147,10 +147,7 @@ public class UserController {
 
   @RequestMapping("/logout")
 	public String logout(HttpSession session) {
-		// 세션을 제거하여 로그아웃 처리
 		session.invalidate();
-
-		// 로그아웃 후 리다이렉트
 		return "redirect:/touro";
 	}
 
@@ -159,7 +156,6 @@ public class UserController {
 	public ModelAndView findID(String user_email){
 		// 입력받은 이메일로 사용자 아이디 받아오기
 		List<String> user_id = userService.findUserid(user_email);
-		System.out.println(user_id);
 
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("user/find-id-result");
@@ -189,7 +185,6 @@ public class UserController {
 				String title = "[TOURO] 비밀번호변경 인증 이메일 입니다"; 
 				String content = System.getProperty("line.separator") + "안녕하세요 회원님" + System.getProperty("line.separator")
 						+ "TOURO 비밀번호찾기(변경) 인증번호는 " + num + " 입니다." + System.getProperty("line.separator"); // 
-				System.out.println(content);
 
 				try {
 					MimeMessage message = mailSender.createMimeMessage();
@@ -202,9 +197,7 @@ public class UserController {
 
 					// 인증메일 발송
 					mailSender.send(message);
-					System.out.println("===== 메일 발송 성공! =====");
 				} catch (Exception e) {
-					System.out.println(e.getMessage());
 				}
 
 				// 인증 메일 발송 후 인증번호 모델에 담아서 인증번호 입력 페이지로 이동
@@ -217,7 +210,6 @@ public class UserController {
 				// UserVO 객체를 세션에 설정
 				session.setAttribute("user", vo);
 				return mv;
-
 				}else {
 					ModelAndView mv = new ModelAndView();
 					mv.setViewName("user/find-pw");

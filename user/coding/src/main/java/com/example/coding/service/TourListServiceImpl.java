@@ -33,7 +33,12 @@ public class TourListServiceImpl implements TourListService{
 
     @Override
     public String addWishList(WishListVO vo) {
+    try{
         return tourListDAO.addWishList(vo);
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+
     }
 
     @Override
@@ -43,12 +48,21 @@ public class TourListServiceImpl implements TourListService{
 
     @Override
     public int deleteWishList(WishListVO vo) {
-        return tourListDAO.deleteWishList(vo);
+        try{
+            return tourListDAO.deleteWishList(vo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public String newInquiry(InquiryVO vo) {
-        return tourListDAO.newInquiry(vo);
+        try{
+            return tourListDAO.newInquiry(vo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 

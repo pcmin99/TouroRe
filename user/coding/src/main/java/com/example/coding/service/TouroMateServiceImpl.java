@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -18,11 +17,9 @@ import com.example.coding.domain.ImgDetailVO;
 import com.example.coding.domain.ImgVO;
 import com.example.coding.domain.LikeVO;
 import com.example.coding.domain.TouroMateChatUserVO;
-import com.example.coding.domain.TouroMateChatVO;
 import com.example.coding.domain.TouroMateVO;
 import com.example.coding.domain.UserProfileVO;
 import com.example.coding.domain.UserVO;
-import com.example.coding.domain.WishListVO;
 
 import jakarta.transaction.Transactional;
 
@@ -201,8 +198,8 @@ public class TouroMateServiceImpl implements TouroMateService {
     @Override
     public UserProfileVO getProfile(UserProfileVO vo) {
 
-        UserProfileVO result = TouromateDAO.getProfile(vo);
-        return result;
+        return TouromateDAO.getProfile(vo);
+
     }
 
     // 게시글 삭제

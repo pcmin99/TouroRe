@@ -52,6 +52,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public UserVO loginCheck(UserVO vo) {
 		// 사용자 아이디를 이용하여 DB에서 저장된 암호화된 비밀번호 가져오기
 		UserVO user = userDAO.passCheck(vo);
@@ -91,9 +92,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public int modifyPassword(UserVO vo) {
-		System.out.println("사용자 아이디 : "+vo.getUser_id());
-
 		// 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(vo.getUser_pass());
 		vo.setUser_pass(encodedPassword);

@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.coding.dao.ImgDetailDAO;
@@ -38,7 +40,6 @@ public class TouroviewServiceImpl implements TouroviewService{
             // 여행지 검색 로직을 수행
             // ...
             List<TourVO> result = touroviewDAO.findByKeyword(vo);
-            // System.err.println(result);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -182,8 +183,14 @@ public class TouroviewServiceImpl implements TouroviewService{
 
     // 후기 게시물 삭제
     @Override
-    public void deleteTouroview(int touroview_num){
-        touroviewDAO.deleteTouroview(touroview_num);
+    public ResponseEntity<String> deleteTouroview(int touroview_num){
+        try{
+            touroviewDAO.deleteTouroview(touroview_num);
+            return ResponseEntity.ok("삭제가 완료되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류가 발생했습니다.");
+        }
+
     }
 
 
@@ -215,7 +222,12 @@ public class TouroviewServiceImpl implements TouroviewService{
     // 좋아요 삭제
     @Override
     public int deleteWishList(LikeVO vo) {
-        return touroviewDAO.deleteWishList(vo);
+        try{
+            return touroviewDAO.deleteWishList(vo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     // Touroview -> tour 가져오기

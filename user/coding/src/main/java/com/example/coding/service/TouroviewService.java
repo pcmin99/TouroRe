@@ -15,6 +15,7 @@ import com.example.coding.domain.TouroviewDetailVO;
 import com.example.coding.domain.TouroviewReviewVO;
 import com.example.coding.domain.TouroviewVO;
 import com.example.coding.domain.UserVO;
+import org.springframework.http.ResponseEntity;
 
 public interface TouroviewService {
     
@@ -75,7 +76,7 @@ public interface TouroviewService {
     public void UpdateImgDetail(ImgVO imgVO);
     
     // 후기 게시판 삭제
-    public void deleteTouroview(int touroview_num);
+    public ResponseEntity<String> deleteTouroview(int touroview_num);
 
     // 파일 업로드
     public void insertFileView(ImgDetailVO idvo);

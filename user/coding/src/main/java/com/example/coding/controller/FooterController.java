@@ -27,7 +27,7 @@ public class FooterController {
         List<FooterTourListVO> list = adminService.footer_tour_list();
         m.addAttribute("footerTourList", list);
         return list;
-    }
+        }
 
     // 푸터 후기 게시판 좋아요 개수 top 4 list 
     @PostMapping(value="/footerTouroview")

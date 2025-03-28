@@ -125,7 +125,6 @@ public class AdminController {
     public void modifyTour (@PathVariable String tourNum , @RequestBody AdminVO tours) {
         tours.setTourNum(tourNum);     
         adminService.modifyTour(tours);
-
     }
 
     // 문의 게시글 (num, title,user_id, regdate,process)

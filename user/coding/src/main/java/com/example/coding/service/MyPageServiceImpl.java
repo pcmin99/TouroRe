@@ -3,6 +3,7 @@ package com.example.coding.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.coding.dao.MyPageDAO;
@@ -142,23 +143,12 @@ public class MyPageServiceImpl implements MyPageService {
     // mypage - 프로필 수정
     @Override
     public void updateUserProfile(UserVO userVO){
-        myPageDAO.updateUserProfile(userVO);
+        try{
+            myPageDAO.updateUserProfile(userVO);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
-
-    // 프로필 사진
-    // @Override
-    // public void saveImageInfo(ImgVO imgVO){
-    //     myPageDAO.saveImageInfo(imgVO);
-    // }
-    // @Override
-    // public ImgVO getImgInfo(String img_real_name){
-    //     return myPageDAO.getImgInfo(img_real_name);
-    // }
-    // @Override
-    // public String storeImage(MultipartFile file){
-    //     return myPageDAO.storeImage(file);
-
-    // }
 
 
     // --------------------------------------------------

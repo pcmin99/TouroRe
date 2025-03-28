@@ -190,14 +190,8 @@ public class MyPageController {
     // 프로필 수정 - 업데이트 ajax 
     // 프로필 정보와 이미지를 업데이트하는 메서드
     @PostMapping("/mypage/updateProfile")
-    public ResponseEntity<String> updateProfile(@ModelAttribute UserVO userVO) {
-        try {
+    public void updateProfile(@ModelAttribute UserVO userVO) {
             myPageService.updateUserProfile(userVO);
-            return ResponseEntity.ok("프로필 업데이트 성공");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("프로필 업데이트 실패");
-        }
     }
     
 
@@ -289,11 +283,9 @@ public class MyPageController {
 
         // 사용자 정보 가져와서 userVO에 저장
         UserVO userVO = myPageService.getUserProfile(userId);
-        // 모델에 사용자 아이디 추가
-        model.addAttribute("userId", userId); // 세션 id 값
-        // UserVO
-        model.addAttribute("userVO", userVO);
 
+        model.addAttribute("userId", userId);
+        model.addAttribute("userVO", userVO);
         return "user/user/appReview";
 
     }

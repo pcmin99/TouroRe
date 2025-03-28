@@ -45,8 +45,7 @@ public class MainAdminController {
   // 관리자 touromate 디테일 페이지 관련 
   @GetMapping("/touromate/touromateNum/{touro_mate_num}")
   public List<AdminVO> touroMateNum(@PathVariable("touro_mate_num") Integer touro_mate_num) {
-      List<AdminVO> result = mainService.touroMateNum(touro_mate_num);
-      return result;
+      return mainService.touroMateNum(touro_mate_num);
   }
 
   // 관리자 대시보드 - 회원수 가져오기
@@ -113,8 +112,7 @@ public class MainAdminController {
   // 관리자 후기 게시판 신고 3번 이상 찾기
   @GetMapping("/touroview-list/blind/count")
   public Integer touroviewBlindCount(@RequestParam Integer touroview_num) {
-    Integer result =  mainService.touroviewBlindCount(touroview_num);
-    return result;
+    return mainService.touroviewBlindCount(touroview_num);
   }
   
   // 관리자 후기 게시판 신고 3번 이상 게시글 블라인드 처리

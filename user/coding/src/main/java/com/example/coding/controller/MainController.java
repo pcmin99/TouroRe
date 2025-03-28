@@ -136,7 +136,6 @@ public class MainController {
     String num7 = vo.getTour_num7().replaceAll("\\.0$", "");
     String num8 = vo.getTour_num8().replaceAll("\\.0$", "");
     String num9 = vo.getTour_num9().replaceAll("\\.0$", "");
-    System.out.println("@"+num1);
     vo.setTour_num1(num1);
     vo.setTour_num2(num2);
     vo.setTour_num3(num3);

@@ -75,8 +75,8 @@
 			`img_detail` imgde ON u.user_id = imgde.user_id
 		LEFT JOIN
 			`img` i ON imgde.img_num = i.img_num
-		WHERE u.admin_authority = 1;
-		order by u.user_id
+		WHERE u.admin_authority = 1
+		ORDER BY userId ;
 	</select>
 
 
@@ -88,7 +88,7 @@
 	like		li		explain => type = ALL
 	-->
 	<select  id="touroviewList" parameterType="AdminTouroViewList" resultType="AdminTouroViewList">
-		SELECT distinct tvw.user_id user_id , 
+		SELECT distinct tvw.user_id user_id ,
 		tvw.touroview_content touroview_content, 
 		li.like_count like_count, 
 		rp.report_count report_count,	

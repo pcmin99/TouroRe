@@ -1,16 +1,17 @@
 package com.example.coding.service;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.example.coding.domain.*;
 import com.example.coding.util.MD5Generator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.coding.dao.AdminDAO;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -21,13 +22,51 @@ public class AdminServiceImpl implements AdminService {
     private AdminDAO adminDAO;
 
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate; // Redis Template
+
+    private static final String CACHE_PREFIX = "touroViewNum:";
+
+
+//    // redis  사용시       4ms ~ 6ms
+//    // redis 사용 안할시    15ms
+//    public List<AdminVO> touroViewNum(Integer touroview_num) {
+//        String cacheKey = CACHE_PREFIX + touroview_num;
+//
+//        // Redis에서 캐시 확인
+//        List<AdminVO> cachedData = (List<AdminVO>) redisTemplate.opsForValue().get(cacheKey);
+//        if (cachedData != null) {
+//            return cachedData;
+//        }
+//
+//        // 캐시에 데이터가 없으면 DB 조회 후 캐싱
+//        List<AdminVO> adminData = adminDAO.touroViewNum(touroview_num);
+//        if (adminData != null && !adminData.isEmpty()) {
+//            redisTemplate.opsForValue().set(cacheKey, adminData, 1, TimeUnit.HOURS); // 1시간 동안 캐싱
+//        }
+//        return adminData;
+//    }
+
+//    public void updateTouroViewNum(Integer touroview_num, List<AdminVO> newData) {
+//        // adminDAO.updateTouroViewNum(touroview_num, newData);
+//        redisTemplate.delete(CACHE_PREFIX + touroview_num); // 캐시 삭제
+//    }
+
+
+
+
+    public List<AdminVO> touroViewNum(Integer touroview_num) {
+        return adminDAO.touroViewNum(touroview_num);
+    }
 
     public List<AdminTourVO> tourList() {
+
         List<AdminTourVO> list = adminDAO.tourList();
         return list;
     }
     
-    // 후기 게시판 내부에서 search 
+    // 후기 게시판 내부에서 search
+    @Transactional(readOnly = true)
     public List<AdminSearchTouro> search_touro(String search_touro){
             if(search_touro == ""){
                 List<AdminSearchTouro> list = adminDAO.search_touro(search_touro);
@@ -72,7 +111,8 @@ public class AdminServiceImpl implements AdminService {
 
 
     // 유저 리스트 출력
-    // ADMINCONTROLLER.userList => 로직 이동 
+    // ADMINCONTROLLER.userList => 로직 이동
+    @Transactional(readOnly = true)
     public List<AdminUserVO> userList() {
     List<AdminUserVO> userlist = adminDAO.userList();
     for(AdminUserVO user : userlist){
@@ -89,10 +129,7 @@ public class AdminServiceImpl implements AdminService {
     List<AdminTouroViewList> viewList = adminDAO.touroviewList();
     return viewList;
     }
-    
-    public List<AdminVO> touroViewNum(Integer touroview_num) {
-        return adminDAO.touroViewNum(touroview_num);
-    }
+
 
 
     // 여행지 이미지 제외 수정

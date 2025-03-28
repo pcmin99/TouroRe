@@ -36,10 +36,8 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/touromate")
 public class TouroMateController {
 
-    // 'MateService'타입의 'mateService'필드 선언
     private final TouroMateService mateService;
 
-    // 'MateController'의 생성자 정의
     public TouroMateController(TouroMateService mateService){
         this.mateService = mateService;
     }
@@ -58,9 +56,6 @@ public class TouroMateController {
         // 세션에서 user_id 가져오기
         HttpSession session = request.getSession();
         UserVO loggedInUser = (UserVO) session.getAttribute("loggedInUser");
-        
-         // 노드 서버와 통신할 때 사용할 URL
-        String nodeServerUrl = "http://175.114.130.19:" + nodeServerPort + "/chat";
 
         
         // 전체 페이지 수를 가져오는 메서드
@@ -102,17 +97,12 @@ public class TouroMateController {
 
         // 해당 게시글의 정보 가져옴
         TouroMateVO touroMate = mateService.getTouroMateById(touro_mate_num);
-
         // 해당 게시글의 여행지 정보를 가져옴
         List<TouroMateVO> travelPlaces = mateService.getTravelPlaces(touro_mate_num);
-
         // 해당 게시글의 작성자 정보를 가져옴
         UserVO authorInfo = mateService.getAuthorInfo(touroMate.getUser_id());
-
         List<ImgVO> imgList = mateService.getImages(touro_mate_num);
-
         int remainingUsers = mateService.getRemainingChatUsers(touro_mate_num);
-
         // 랜덤 여행지 - 3개
         List<Touro> randTour = mateService.getRandTour();
 
@@ -128,34 +118,25 @@ public class TouroMateController {
     @PostMapping("/joinChat")
     @ResponseBody
     public String joinChat(@RequestParam int touro_mate_num, HttpServletRequest request ) {
-        // 세션에서 user_id 가져오기
+
         HttpSession session = request.getSession();
         UserVO loggedInUser = (UserVO) session.getAttribute("loggedInUser");
+        return mateService.joinChat(loggedInUser.getUser_id(), touro_mate_num, null);
 
-        try {
-            if (loggedInUser != null) {
-                String result = mateService.joinChat(loggedInUser.getUser_id(), touro_mate_num, null);
-                return result;
-            } else {
-                return "로그인이 필요합니다.";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "채팅 참가 중 오류 발생";
-        }
+
     }
 
     // 사용자 프로필 가져와서 채팅에 붙이기
     @RequestMapping(value = "/getprofileImg", method={RequestMethod.POST})
    @ResponseBody
    public String requestMethodName(UserProfileVO vo) {
-
       vo = mateService.getProfile(vo);
-        String img_real_name = vo.getImg_real_name();
+      String img_real_name = vo.getImg_real_name();
       try {
             if (vo.getImg_real_name() != null && vo.getImg_real_name() != "" && !img_real_name.equals("5ee25b671da2a46f118d0a4454d822a5")){
                 return img_real_name;
-            }else return "NO";
+            }else
+                return "NO";
       } catch (Exception e) {
          return "default_profile.png";
       }

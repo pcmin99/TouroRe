@@ -108,7 +108,6 @@ public class TourPageController {
 	@RequestMapping(value = "/userInfo", method = {RequestMethod.POST})
 	@ResponseBody
 	public UserVO userInfo(@RequestParam("user_id") String user_id){
-		System.out.println(user_id);
 		UserVO vo = new UserVO();
 		vo.setUser_id(user_id);
 		vo = userInfoService.getUserInfo(vo);
@@ -123,10 +122,8 @@ public class TourPageController {
 	@RequestMapping(value = "/addWishList", method = {RequestMethod.POST})
 	@ResponseBody
 	public String addWishList(@ModelAttribute("vo") WishListVO vo){
+		// return tourListService.addWishList(vo);
 		String res = tourListService.addWishList(vo);
-		if (res.equals("1")){
-			System.out.println("찜 리스트 추가");
-		}else System.out.println("에러");
 		return res;
 	}
 
@@ -139,8 +136,8 @@ public class TourPageController {
 	@RequestMapping(value = "/ckWishList", method = {RequestMethod.POST})
 	@ResponseBody
 	public String ckWishList(@ModelAttribute("vo") WishListVO vo){
-		String res = tourListService.ckWishList(vo);
-		return res;
+		return  tourListService.ckWishList(vo);
+
 	}
 
 	/*****
@@ -151,14 +148,8 @@ public class TourPageController {
 
 	@RequestMapping(value = "/deleteWishList", method = {RequestMethod.POST})
 	@ResponseBody
-	public String deleteWishList(@ModelAttribute("vo") WishListVO vo){
-		int result = tourListService.deleteWishList(vo);
-		if (result == 1) {
-			return "ok";
-		} else {
-			return "no";
-		}
-		
+	public void deleteWishList(@ModelAttribute("vo") WishListVO vo){
+		tourListService.deleteWishList(vo);
 	}
 
 
@@ -171,8 +162,7 @@ public class TourPageController {
 	@RequestMapping(value ="/inquiry", method={RequestMethod.POST})
 	@ResponseBody
 	public String newInquiry(@ModelAttribute("vo") InquiryVO vo) {
-		String res = tourListService.newInquiry(vo);
-		return res;
+		return tourListService.newInquiry(vo);
 	}
 
 	// 웹 소켓 전달 값 처리
@@ -204,12 +194,8 @@ public class TourPageController {
 	@ResponseBody
 	public String requestMethodName(@ModelAttribute("vo") UserProfileVO vo) {
 		vo = userInfoService.getProfile(vo);
-		// null 값 경우 default_profile.png 반환
 		try {
-		if (vo.getImg_real_name() != null && vo.getImg_real_name() != ""){
 			return vo.getImg_real_name();
-			
-		}else return "default_profile.png";	
 		} catch (Exception e) {
 			return "default_profile.png";
 		}
