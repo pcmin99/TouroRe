@@ -28,24 +28,24 @@ public class AdminServiceImpl implements AdminService {
     private static final String CACHE_PREFIX = "touroViewNum:";
 
 
-//    // redis  사용시       4ms ~ 6ms
+//    // redis  사용시       4ms ~ 5ms
 //    // redis 사용 안할시    15ms
-//    public List<AdminVO> touroViewNum(Integer touroview_num) {
-//        String cacheKey = CACHE_PREFIX + touroview_num;
-//
-//        // Redis에서 캐시 확인
-//        List<AdminVO> cachedData = (List<AdminVO>) redisTemplate.opsForValue().get(cacheKey);
-//        if (cachedData != null) {
-//            return cachedData;
-//        }
-//
-//        // 캐시에 데이터가 없으면 DB 조회 후 캐싱
-//        List<AdminVO> adminData = adminDAO.touroViewNum(touroview_num);
-//        if (adminData != null && !adminData.isEmpty()) {
-//            redisTemplate.opsForValue().set(cacheKey, adminData, 1, TimeUnit.HOURS); // 1시간 동안 캐싱
-//        }
-//        return adminData;
-//    }
+    public List<AdminVO> touroViewNum(Integer touroview_num) {
+        String cacheKey = CACHE_PREFIX + touroview_num;
+
+        // Redis에서 캐시 확인
+        List<AdminVO> cachedData = (List<AdminVO>) redisTemplate.opsForValue().get(cacheKey);
+        if (cachedData != null) {
+            return cachedData;
+        }
+
+        // 캐시에 데이터가 없으면 DB 조회 후 캐싱
+        List<AdminVO> adminData = adminDAO.touroViewNum(touroview_num);
+        if (adminData != null && !adminData.isEmpty()) {
+            redisTemplate.opsForValue().set(cacheKey, adminData, 1, TimeUnit.HOURS); // 1시간 동안 캐싱
+        }
+        return adminData;
+    }
 
 //    public void updateTouroViewNum(Integer touroview_num, List<AdminVO> newData) {
 //        // adminDAO.updateTouroViewNum(touroview_num, newData);
@@ -55,12 +55,11 @@ public class AdminServiceImpl implements AdminService {
 
 
 
-    public List<AdminVO> touroViewNum(Integer touroview_num) {
-        return adminDAO.touroViewNum(touroview_num);
-    }
+//    public List<AdminVO> touroViewNum(Integer touroview_num) {
+//        return adminDAO.touroViewNum(touroview_num);
+//    }
 
     public List<AdminTourVO> tourList() {
-
         List<AdminTourVO> list = adminDAO.tourList();
         return list;
     }

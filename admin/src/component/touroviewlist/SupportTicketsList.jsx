@@ -1,7 +1,4 @@
 import React, { useEffect,useState } from "react";
-import SelectInput from "../form/SelectInput";
-import { ticketsList } from "../../data/ticketsList";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -32,7 +29,6 @@ function SupportTicketsList() {
     .catch((err) => console.log(err))
   };
 
-  // 현재 페이지에 해당하는 아이템들을 추출
   const indexOfLastItem = page * show;
   const indexOfFirstItem = indexOfLastItem - show;
   
