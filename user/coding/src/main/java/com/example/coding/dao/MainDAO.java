@@ -15,6 +15,7 @@ import com.example.coding.domain.TourVO;
 import com.example.coding.domain.TouroviewReviewVO;
 import com.example.coding.domain.TouroviewVO;
 import com.example.coding.domain.UserVO;
+import org.springframework.lang.Nullable;
 
 @Mapper
 public interface MainDAO {
@@ -80,7 +81,8 @@ public interface MainDAO {
   public List<MainAdminVO> locPrefer();
 
   // 관리자 후기 게시판 신고 3번 이상 찾기
-  public Integer touroviewBlindCount(Integer touroview_num);
+  @Nullable
+  public Integer touroviewBlindCount(@Nullable Integer touroview_num);
 
   // 관리자 후기 게시판 신고 3번 이상 게시글 블라인드 처리
   public void touroviewBlind(TouroviewVO vo);

@@ -96,7 +96,6 @@ public class AdminController {
 }
 
 
-    // 일단 로직 service단에 던짐
     // 어차피 List 값 서비스 단에 던진 후 리턴 받아서 모델이 붙이기에 로직 이동
     @GetMapping("/user/userList")
     public List<AdminUserVO> userList(Model m) {

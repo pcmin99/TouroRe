@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.example.coding.domain.*;
 import com.example.coding.util.MD5Generator;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -22,42 +24,40 @@ public class AdminServiceImpl implements AdminService {
     private AdminDAO adminDAO;
 
 
+
+
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate; // Redis Template
+    private RedisTemplate<String, Object> redisTemplate;
 
-    private static final String CACHE_PREFIX = "touroViewNum:";
+    @Autowired
+    private ObjectMapper objectMapper ;
 
+    private static final String CACHE_PREFIX =  System.getenv("redis_prefix");
 
-//    // redis  사용시       4ms ~ 5ms
-//    // redis 사용 안할시    15ms
+    // redis  사용시       4ms ~ 5ms
+    // redis 사용 안할시    15ms
+    // 초기에 캐시에 값이 없을시 불러와야 하기에 초기엔 좀 나옴
     public List<AdminVO> touroViewNum(Integer touroview_num) {
-        String cacheKey = CACHE_PREFIX + touroview_num;
+        try{
+            String cacheKey = CACHE_PREFIX + touroview_num;
 
-        // Redis에서 캐시 확인
-        List<AdminVO> cachedData = (List<AdminVO>) redisTemplate.opsForValue().get(cacheKey);
-        if (cachedData != null) {
-            return cachedData;
+            String cachedData = (String) redisTemplate.opsForValue().get(cacheKey);
+            if (cachedData != null) {
+                return objectMapper.readValue(cachedData, new TypeReference<List<AdminVO>>() {});
+            }
+            // 캐시에 데이터가 없으면 DB 조회 후 캐싱
+            List<AdminVO> adminData = adminDAO.touroViewNum(touroview_num);
+            if (adminData != null && !adminData.isEmpty()) {
+                String jsonData = objectMapper.writeValueAsString(adminData);
+                redisTemplate.opsForValue().set(cacheKey, jsonData, 10, TimeUnit.MINUTES);
+            }
+            return adminData;
         }
-
-        // 캐시에 데이터가 없으면 DB 조회 후 캐싱
-        List<AdminVO> adminData = adminDAO.touroViewNum(touroview_num);
-        if (adminData != null && !adminData.isEmpty()) {
-            redisTemplate.opsForValue().set(cacheKey, adminData, 1, TimeUnit.HOURS); // 1시간 동안 캐싱
+        catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return adminData;
     }
 
-//    public void updateTouroViewNum(Integer touroview_num, List<AdminVO> newData) {
-//        // adminDAO.updateTouroViewNum(touroview_num, newData);
-//        redisTemplate.delete(CACHE_PREFIX + touroview_num); // 캐시 삭제
-//    }
-
-
-
-
-//    public List<AdminVO> touroViewNum(Integer touroview_num) {
-//        return adminDAO.touroViewNum(touroview_num);
-//    }
 
     public List<AdminTourVO> tourList() {
         List<AdminTourVO> list = adminDAO.tourList();
@@ -67,14 +67,22 @@ public class AdminServiceImpl implements AdminService {
     // 후기 게시판 내부에서 search
     @Transactional(readOnly = true)
     public List<AdminSearchTouro> search_touro(String search_touro){
+        String cacheKey = CACHE_PREFIX+ search_touro ;
+        List<AdminSearchTouro> cacheData = (List<AdminSearchTouro>) redisTemplate.opsForValue().get(cacheKey) ;
+        if(cacheData != null ){
+            return cacheData ;
+        }
+        else{
             if(search_touro == ""){
                 List<AdminSearchTouro> list = adminDAO.search_touro(search_touro);
+                redisTemplate.opsForValue().set(cacheKey,list,10,TimeUnit.MINUTES) ;
                 return list ;
             }
             String search_touroplus = search_touro+ '*' ; // SQL 에서 FULL TEST SEARCH 를 쓰면서 lIKE 처럼 연관을 뽑기 위해선 받는 데이터에 * 를 붙여야함
             List<AdminSearchTouro> list = adminDAO.search_touro(search_touroplus);
+            redisTemplate.opsForValue().set(cacheKey,list,10,TimeUnit.MINUTES) ;
             return list ;
-
+        }
     }
 
     // 디테일

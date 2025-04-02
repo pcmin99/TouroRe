@@ -1,8 +1,10 @@
 package com.example.coding.service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.coding.dao.MainDAO;
@@ -23,6 +25,17 @@ public class MainServiceImpl implements MainService{
 
   @Autowired
   MainDAO mainDAO;
+
+
+
+  @Autowired
+  private RedisTemplate<String, Object> redisTemplate;
+
+
+  private static final String CACHE_PREFIX =  System.getenv("redis_prefix");
+
+//  private static final Integer CACHE_PREFIX_INTEGER = Integer.valueOf(System.getenv("SOME_ENV"));
+//
 
   // 유저별 선호 지역 가져오기 - 3개 - ajax
   @Override
@@ -178,10 +191,20 @@ public class MainServiceImpl implements MainService{
   public List<MainAdminVO> locPrefer() {
     return mainDAO.locPrefer();  
   }
-  // 각 게시물 블라인드 수 가져오기
+
+  // 각 게시물 블라인드 수 가져오기 - redis
   @Override
   public Integer touroviewBlindCount(Integer touroview_num) {
-    return mainDAO.touroviewBlindCount(touroview_num);
+    String cachekey = CACHE_PREFIX+ touroview_num ;
+    Integer cacheData = (Integer) redisTemplate.opsForValue().get(cachekey);
+    if(cacheData != null){
+      return cacheData ;
+    }
+    Integer noCacheData = mainDAO.touroviewBlindCount(touroview_num);
+    if(noCacheData != null && !noCacheData.describeConstable().isEmpty()){
+        redisTemplate.opsForValue().set(String.valueOf(cachekey), noCacheData, 3, TimeUnit.MINUTES);
+    }
+    return noCacheData ;
   } 
 
   // 관리자 후기 게시판 신고 3번 이상 게시글 블라인드 처리
@@ -220,6 +243,14 @@ public class MainServiceImpl implements MainService{
     return mainDAO.popularTour();
   }
 
+  // 관리자 유저 상세정보 보기
+  @Override
+  public AdminVO userListOne(String user_id) {
+    return mainDAO.userListOne(user_id);
+  }
+
+
+
   // 여행지 - ajax로 리뷰 달기!!!
   public void reviewInsert(TourReviewVO vo) {
     mainDAO.reviewInsert(vo);
@@ -230,8 +261,7 @@ public class MainServiceImpl implements MainService{
   public List<TourReviewVO> reviewSelect(TourReviewVO vo) {
     List<TourReviewVO> result = mainDAO.reviewSelect(vo);
     return result;
-  } 
-
+  }
 
    // 여행후기 - ajax로 리뷰 달기!!!
    public void touroviewReviewInsert(TouroviewReviewVO vo) {
@@ -245,11 +275,6 @@ public class MainServiceImpl implements MainService{
     return result;
   }
 
-  // 관리자 유저 상세정보 보기
-  @Override
-  public AdminVO userListOne(String user_id) {
-    return mainDAO.userListOne(user_id);
-  }
 
  
 
