@@ -19,10 +19,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserProfileVO getProfile(UserProfileVO vo) {
-        try{
+
             return userInfoDAO.getProfile(vo);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
     };
 }

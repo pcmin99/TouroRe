@@ -10,7 +10,7 @@ public class AdminVO {
     
 
     
-    private String tourNum;                 // 여행지 번호 
+    private Integer tourNum;                 // 여행지 번호
     private String tourName;                // 여행지 명 
     private Integer checkNum;               //  조회수 
     private Integer imgNum ;                // 이미지 번호
@@ -34,7 +34,7 @@ public class AdminVO {
     private String tourStar;                // 여행지 별점
     private String tourTel ;                // 여행지 전화번호
 
-    private String tour_num;                // 여행지 번호 
+    private Integer tour_num;                // 여행지 번호
     private String tour_name;               // 여행지 명 
     private Integer check_num;              //  조회수 
     private Integer img_num ;               // 이미지 번호

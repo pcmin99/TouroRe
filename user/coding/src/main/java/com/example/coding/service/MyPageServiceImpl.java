@@ -62,9 +62,11 @@ public class MyPageServiceImpl implements MyPageService {
     public int getTouroviewReviewCountByUserId(String userId){
         return myPageDAO.getTouroviewReviewCountByUserId(userId);
     }
+
     // 여행지 담은 개수 가져오기
     @Override
     public int getTourWishCountByUserId(String userId){
+
         return myPageDAO.getTourWishCountByUserId(userId);
     }
 
@@ -73,16 +75,19 @@ public class MyPageServiceImpl implements MyPageService {
     // 여행 친구 개수
     @Override
     public int countTouroMate(String userId){
+
         return myPageDAO.countTouroMate(userId);
     }
     // 여행 후기 개수
     @Override
     public int countTouroview(String userId){
+
         return myPageDAO.countTouroview(userId);
     }
     // 나의 발자취 개수
     @Override
     public int countReceipt(String userId){
+
         return myPageDAO.countReceipt(userId);
     }
 
@@ -95,9 +100,11 @@ public class MyPageServiceImpl implements MyPageService {
         int offset = (page - 1) * pageSize;
         return myPageDAO.getMyPageTouroMateList(userId, pageSize, offset);
     }
+
     // 개수
     @Override
     public int getTotalTouroMateCount(String userId){
+
         return myPageDAO.countTouroMates(userId);
     }
 
@@ -110,6 +117,7 @@ public class MyPageServiceImpl implements MyPageService {
     // 개수
     @Override
     public int getTotalTouroviewCount(String userId) {
+
         return myPageDAO.countTouroviews(userId);
     }
 
@@ -143,11 +151,7 @@ public class MyPageServiceImpl implements MyPageService {
     // mypage - 프로필 수정
     @Override
     public void updateUserProfile(UserVO userVO){
-        try{
             myPageDAO.updateUserProfile(userVO);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 

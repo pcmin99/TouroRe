@@ -177,13 +177,11 @@ public class HSKController {
         return "touroview/touroview_list";
      } 
 
-
      @GetMapping("/findByKeyword")
     public ResponseEntity<List<TourVO>> findByKeyword(@RequestParam String keyword) {
         try {
             TourVO vo = new TourVO();
             vo.setKeyword(keyword); // TourVO 객체에 키워드 설정
-
             List<TourVO> tours = touroviewService.findByKeyword(vo);
             return ResponseEntity.ok(tours); // 검색 결과 반환
         } catch (Exception e) {

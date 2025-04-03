@@ -114,6 +114,8 @@ public class MainAdminController {
   public Integer touroviewBlindCount(@RequestParam Integer touroview_num) {
     return mainService.touroviewBlindCount(touroview_num);
   }
+
+
   
   // 관리자 후기 게시판 신고 3번 이상 게시글 블라인드 처리
   @PostMapping("/touroview/blind/{touroview_num}")

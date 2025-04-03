@@ -3,6 +3,7 @@ package com.example.coding.service;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import com.example.coding.domain.TouroviewReviewVO;
 import com.example.coding.domain.TouroviewVO;
 import com.example.coding.domain.UserVO;
 
+@Slf4j
 @Service
 public class MainServiceImpl implements MainService{
 
@@ -195,16 +197,26 @@ public class MainServiceImpl implements MainService{
   // 각 게시물 블라인드 수 가져오기 - redis
   @Override
   public Integer touroviewBlindCount(Integer touroview_num) {
-    String cachekey = CACHE_PREFIX+ touroview_num ;
-    Integer cacheData = (Integer) redisTemplate.opsForValue().get(cachekey);
-    if(cacheData != null){
-      return cacheData ;
-    }
-    Integer noCacheData = mainDAO.touroviewBlindCount(touroview_num);
-    if(noCacheData != null && !noCacheData.describeConstable().isEmpty()){
+    try{
+      if(CACHE_PREFIX != null){
+        String cachekey = CACHE_PREFIX+ touroview_num ;
+        Integer cacheData = (Integer) redisTemplate.opsForValue().get(cachekey);
+        if(cacheData != null){
+          return cacheData ;
+        }
+      }
+      Integer noCacheData = mainDAO.touroviewBlindCount(touroview_num);
+      String cachekey = CACHE_PREFIX+ touroview_num ;
+      if(noCacheData != null && !noCacheData.describeConstable().isEmpty()){
         redisTemplate.opsForValue().set(String.valueOf(cachekey), noCacheData, 3, TimeUnit.MINUTES);
+      }
+      return noCacheData ;
+
+    } catch (Exception e) {
+      log.error("touroviewBlindCount 에러:",e);
+      throw new RuntimeException(e);
     }
-    return noCacheData ;
+
   } 
 
   // 관리자 후기 게시판 신고 3번 이상 게시글 블라인드 처리
@@ -246,7 +258,19 @@ public class MainServiceImpl implements MainService{
   // 관리자 유저 상세정보 보기
   @Override
   public AdminVO userListOne(String user_id) {
-    return mainDAO.userListOne(user_id);
+    try{
+        String cachekey = CACHE_PREFIX+ user_id ;
+        if(CACHE_PREFIX != null){
+          return (AdminVO)redisTemplate.opsForValue().get(cachekey);
+        }
+        AdminVO adminVO = mainDAO.userListOne(user_id);
+        redisTemplate.opsForValue().set(cachekey,adminVO,10,TimeUnit.MINUTES);
+        return adminVO ;
+    } catch (Exception e) {
+      log.error("userListOne 에러:",e);
+      throw new RuntimeException(e);
+    }
+
   }
 
 

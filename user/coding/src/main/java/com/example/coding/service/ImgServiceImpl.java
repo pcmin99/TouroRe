@@ -4,6 +4,7 @@ import com.example.coding.dao.*;
 import com.example.coding.domain.ImgDetailVO;
 import com.example.coding.util.MD5Generator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.coding.domain.ImgVO;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.ArrayList;
 
 @Service
 public class ImgServiceImpl implements ImgService {
@@ -29,6 +31,11 @@ public class ImgServiceImpl implements ImgService {
 
     @Autowired
     UserDAO userDAO ;
+
+    @Autowired
+    private RedisTemplate<String , Object> redisTemplate ;
+
+    private static final String CACHE_PREFIX =  System.getenv("redis_prefix");
 
 
 
@@ -86,6 +93,11 @@ public class ImgServiceImpl implements ImgService {
     
     @Override
     public ImgVO selectFile(ImgVO vo){
+        String cacheKey = CACHE_PREFIX + vo ;
+        if(CACHE_PREFIX != null){
+            redisTemplate.opsForList().getOperations() ;
+        }
+
         return imgDAO.selectFile(vo);
     };
 

@@ -13,7 +13,7 @@ public class AdminTourDetailVO {
     private String tour_name ;
     private String img_path ;
 
-    private String tourNum ; // 해당 숫자 보내는곳,받는곳 다 Num으로 처리 하였기에 작성
+    private Integer tourNum ; // 해당 숫자 보내는곳,받는곳 다 Num으로 처리 하였기에 작성
 
 
 

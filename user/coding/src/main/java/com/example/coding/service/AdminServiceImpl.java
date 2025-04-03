@@ -8,6 +8,7 @@ import com.example.coding.domain.*;
 import com.example.coding.util.MD5Generator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,15 @@ import com.example.coding.dao.AdminDAO;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+
+@Slf4j
 @Service
 public class AdminServiceImpl implements AdminService {
 
 
     @Autowired
     private AdminDAO adminDAO;
+
 
 
 
@@ -39,13 +43,15 @@ public class AdminServiceImpl implements AdminService {
     // 초기에 캐시에 값이 없을시 불러와야 하기에 초기엔 좀 나옴
     public List<AdminVO> touroViewNum(Integer touroview_num) {
         try{
-            String cacheKey = CACHE_PREFIX + touroview_num;
-
-            String cachedData = (String) redisTemplate.opsForValue().get(cacheKey);
-            if (cachedData != null) {
-                return objectMapper.readValue(cachedData, new TypeReference<List<AdminVO>>() {});
+            if(CACHE_PREFIX != null){
+                String cacheKey1 = CACHE_PREFIX +  touroview_num ;
+                Integer cachedData = (Integer) redisTemplate.opsForValue().get(cacheKey1);
+                if (cachedData != null) {
+                    return (List<AdminVO>) redisTemplate.opsForList() ; // opsForValue()는 문자열 기반이라 List로 변경
+                }
             }
             // 캐시에 데이터가 없으면 DB 조회 후 캐싱
+            String cacheKey = CACHE_PREFIX +  touroview_num ;
             List<AdminVO> adminData = adminDAO.touroViewNum(touroview_num);
             if (adminData != null && !adminData.isEmpty()) {
                 String jsonData = objectMapper.writeValueAsString(adminData);
@@ -54,6 +60,7 @@ public class AdminServiceImpl implements AdminService {
             return adminData;
         }
         catch (Exception e) {
+            log.error("touroViewNum 에러:",e);
             throw new RuntimeException(e);
         }
     }
@@ -87,7 +94,20 @@ public class AdminServiceImpl implements AdminService {
 
     // 디테일
     public AdminTourDetailVO tourdetail(AdminTourDetailVO vo) {
-        return adminDAO.tourdetail(vo);
+        Object cacheKey = CACHE_PREFIX + vo ;
+        AdminTourDetailVO ad = (AdminTourDetailVO) redisTemplate.opsForValue().get(cacheKey);
+        try{
+            if(CACHE_PREFIX != null){
+                return ad ;
+            }else{
+                return adminDAO.tourdetail(vo);
+            }
+        } catch (Exception e) {
+            log.error("tourdetail 에러 :",e);
+            throw new RuntimeException(e);
+        }
+        //Object cacheKey = CACHE_PREFIX + vo ;
+
     }
 
     // 여행지 삭제
@@ -109,6 +129,7 @@ public class AdminServiceImpl implements AdminService {
             multipartFile.transferTo(new File(img_path));
             vo.setTour_img1_path("tourimg\\" + img_real_name);
         } catch (Exception e) {
+            log.error("에러:",e);
             e.printStackTrace();
         }
 

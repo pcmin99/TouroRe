@@ -1,12 +1,16 @@
 package com.example.coding.service;
 
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,7 @@ import com.example.coding.domain.TouroviewVO;
 import com.example.coding.domain.UserVO;
 
 
+@Slf4j
 @Service
 public class TouroviewServiceImpl implements TouroviewService{
 
@@ -32,18 +37,28 @@ public class TouroviewServiceImpl implements TouroviewService{
     @Autowired
     public ImgDetailDAO imgDetailDAO;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    private static final String CACHE_PREFIX =  System.getenv("redis_prefix");
+
+
     // ----------------------------------------------------- touroview_insert
     // 여행지 검색
     @Override
     public List<TourVO> findByKeyword(TourVO vo) {
         try {
-            // 여행지 검색 로직을 수행
-            // ...
+            String cacheKey = CACHE_PREFIX+ vo ;
+            Object cachedDate = (Object) redisTemplate.opsForValue().get(cacheKey);
+            if( cachedDate != null){
+                return (List<TourVO>) redisTemplate.opsForValue();
+            }
             List<TourVO> result = touroviewDAO.findByKeyword(vo);
+            redisTemplate.opsForValue().set(cacheKey,result,10, TimeUnit.MINUTES);
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("여행지 검색 중 오류 발생", e);
+            log.error("findByKeyword 에러 : ",e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -130,15 +145,27 @@ public class TouroviewServiceImpl implements TouroviewService{
     // 게시물 id로(TouroviewVO) 게시물 가져오기(detail)
     @Override
     public TouroviewVO getTouroviewById(int touroview_num){
-
-        return touroviewDAO.getTouroviewById(touroview_num);
+        String cacheKey = CACHE_PREFIX + touroview_num ;
+        TouroviewVO cacheTouroviewVO = (TouroviewVO)redisTemplate.opsForValue().get(cacheKey) ;
+        if(redisTemplate != null){
+            return cacheTouroviewVO ;
+        }
+        TouroviewVO touroviewVONoCache = touroviewDAO.getTouroviewById(touroview_num) ;
+        redisTemplate.opsForValue().set(cacheKey,touroviewVONoCache,10,TimeUnit.MINUTES);
+        return touroviewVONoCache ;
     }
 
 
     // 여행지(TourVO) 번호를 이용하여 해당 여행지 정보를 가져오기
     @Override
    public TourVO getTourByTouroviewId(int touroview_num){
-        return touroviewDAO.getTourByTouroviewId(touroview_num); 
+        String cacheKey = CACHE_PREFIX + touroview_num ;
+        if(redisTemplate != null){
+            redisTemplate.opsForValue().get(cacheKey) ;
+        }
+        TourVO tourVoNull = touroviewDAO.getTourByTouroviewId(touroview_num) ;
+        redisTemplate.opsForValue().set(cacheKey,tourVoNull ,10, TimeUnit.MINUTES);
+        return tourVoNull  ;
    }
 
 
@@ -197,14 +224,33 @@ public class TouroviewServiceImpl implements TouroviewService{
     // 디테일 배경 이미지 가져오기
     @Override
     public TouroviewDetailVO getTouroviewImg(int tour_num) {
+        try{
+            String cacheKey = CACHE_PREFIX + tour_num ;
+            TouroviewDetailVO cacheData = (TouroviewDetailVO) redisTemplate.opsForValue().get(cacheKey) ;
+            if(CACHE_PREFIX != null){
+                return cacheData ;
+            }
+            TouroviewDetailVO result  = touroviewDAO.getTouroviewImg(tour_num);
+            redisTemplate.opsForValue().set(cacheKey,result, 10, TimeUnit.MINUTES);
+            return result ;
+        } catch (Exception e) {
+            log.error("getTouroviewImg 에러 : ",e);
+            throw new RuntimeException(e);
+        }
 
-        return touroviewDAO.getTouroviewImg(tour_num);
     }
 
     // 디테일 배경 이미지 가져오기
     @Override
     public List<TouroviewDetailVO> detailviewImg(int touroview_num) {
-        return touroviewDAO.detailviewImg(touroview_num);
+        String cacheKey = CACHE_PREFIX + touroview_num ;
+        List<TouroviewDetailVO> cacheDate = (List<TouroviewDetailVO>) redisTemplate.opsForValue().get(cacheKey) ;
+        if(CACHE_PREFIX != null){
+            return cacheDate ;
+        }
+        List<TouroviewDetailVO> NoCacheKey = touroviewDAO.detailviewImg(touroview_num);
+        redisTemplate.opsForValue().set(cacheKey,NoCacheKey,10,TimeUnit.MINUTES);
+        return NoCacheKey;
     }
 
     // 좋아요 추가

@@ -70,7 +70,7 @@ public class AdminController {
 
     // 여행지 디테일 페이지
     @GetMapping("/tour-view/{tourNum}")
-    public AdminTourDetailVO TourDetail(@PathVariable("tourNum") String tourNum) {
+    public AdminTourDetailVO TourDetail(@PathVariable("tourNum") Integer tourNum) {
         AdminTourDetailVO vo = new AdminTourDetailVO();
         vo.setTourNum(tourNum);
         AdminTourDetailVO result = adminService.tourdetail(vo);
@@ -80,7 +80,7 @@ public class AdminController {
 
     // 리스트에서 여행지 삭제
     @DeleteMapping("/tour-list/{tourNum}")
-    public void deleteNum(@PathVariable String tourNum) {
+    public void deleteNum(@PathVariable Integer tourNum) {
         AdminVO vo = new AdminVO();
         vo.setTour_num(tourNum);
         vo.setTourNum(tourNum);
@@ -121,7 +121,7 @@ public class AdminController {
 
     // 여행지 상세에서 수정 (이미지 업로드 이야기 없기에 이미지 수정은 x)
     @PutMapping("/tour-view/modifyTour/{tourNum}")
-    public void modifyTour (@PathVariable String tourNum , @RequestBody AdminVO tours) {
+    public void modifyTour (@PathVariable Integer tourNum , @RequestBody AdminVO tours) {
         tours.setTourNum(tourNum);     
         adminService.modifyTour(tours);
     }

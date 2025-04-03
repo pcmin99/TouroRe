@@ -28,16 +28,13 @@ public class TourListServiceImpl implements TourListService{
 
     @Override
     public TourVO getTourData(TourVO vo) {
+
         return tourListDAO.getTourData(vo);
     }
 
     @Override
     public String addWishList(WishListVO vo) {
-    try{
         return tourListDAO.addWishList(vo);
-    } catch (Exception e) {
-        throw new RuntimeException(e);
-    }
 
     }
 
