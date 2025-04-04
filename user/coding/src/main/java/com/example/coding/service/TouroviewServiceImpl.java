@@ -145,20 +145,28 @@ public class TouroviewServiceImpl implements TouroviewService{
     // 게시물 id로(TouroviewVO) 게시물 가져오기(detail)
     @Override
     public TouroviewVO getTouroviewById(int touroview_num){
-        String cacheKey = CACHE_PREFIX + touroview_num ;
-        TouroviewVO cacheTouroviewVO = (TouroviewVO)redisTemplate.opsForValue().get(cacheKey) ;
-        if(redisTemplate != null){
-            return cacheTouroviewVO ;
+        try{
+            String cacheKey = CACHE_PREFIX + touroview_num ;
+            TouroviewVO cacheTouroviewVO = (TouroviewVO)redisTemplate.opsForValue().get(cacheKey) ;
+            if(redisTemplate != null){
+                return cacheTouroviewVO ;
+            }
+            TouroviewVO touroviewVONoCache = touroviewDAO.getTouroviewById(touroview_num) ;
+            redisTemplate.opsForValue().set(cacheKey,touroviewVONoCache,10,TimeUnit.MINUTES);
+            return touroviewVONoCache ;
+
+        } catch (Exception e) {
+            log.error("getTouroviewById 에러 :",e);
+            throw new RuntimeException(e);
         }
-        TouroviewVO touroviewVONoCache = touroviewDAO.getTouroviewById(touroview_num) ;
-        redisTemplate.opsForValue().set(cacheKey,touroviewVONoCache,10,TimeUnit.MINUTES);
-        return touroviewVONoCache ;
+
     }
 
 
     // 여행지(TourVO) 번호를 이용하여 해당 여행지 정보를 가져오기
     @Override
    public TourVO getTourByTouroviewId(int touroview_num){
+        
         String cacheKey = CACHE_PREFIX + touroview_num ;
         if(redisTemplate != null){
             redisTemplate.opsForValue().get(cacheKey) ;
@@ -215,7 +223,8 @@ public class TouroviewServiceImpl implements TouroviewService{
             touroviewDAO.deleteTouroview(touroview_num);
             return ResponseEntity.ok("삭제가 완료되었습니다.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류가 발생했습니다.");
+            log.error("deleteTouroview 에러: ",e);
+            return ResponseEntity.status(HttpStatus.OK).body("삭제 중 오류가 발생했습니다."); // 일단 사용자에게 200을 보내지만 에러도 동시에 보냄
         }
 
     }
