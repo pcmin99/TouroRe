@@ -1,6 +1,7 @@
 package com.example.coding.service;
 
 import java.io.File;
+import java.sql.Time;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +40,11 @@ public class AdminServiceImpl implements AdminService {
 
     private static final String CACHE_PREFIX =  System.getenv("redis_prefix");
 
-    // redis  사용시       4ms ~ 5ms
-    // redis 사용 안할시    15ms
-    // 초기에 캐시에 값이 없을시 불러와야 하기에 초기엔 좀 나옴
+    /**
+     * redis O = 4ms
+     * redis X = 20ms
+      초기에 캐시에 값이 없을시 불러와야 하기에 초기엔 좀 나옴
+     */
     public List<AdminVO> touroViewNum(Integer touroview_num) {
         try{
             if(CACHE_PREFIX != null){
@@ -65,10 +69,23 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-
+    /**
+     * 기본 캐쉬 키가 null일 경우 
+     * db에서 값을 가져와 새롭게 key에 넣은 후 새로운 키값으로 캐쉬에 저장
+     *
+     * redis X =  21ms
+     * redis O =  4ms
+     */
     public List<AdminTourVO> tourList() {
-        List<AdminTourVO> list = adminDAO.tourList();
-        return list;
+        String cacheKey = CACHE_PREFIX ;
+        if(cacheKey == null){
+            List<AdminTourVO> list = adminDAO.tourList();
+            String newcacheKey = CACHE_PREFIX + list ;
+            redisTemplate.opsForValue().set(newcacheKey,list,10, TimeUnit.MINUTES);
+            return list;
+        }
+            List<AdminTourVO> cacheData = (List<AdminTourVO>) redisTemplate.opsForValue().get(cacheKey);
+            return cacheData ;
     }
     
     // 후기 게시판 내부에서 search
@@ -106,8 +123,6 @@ public class AdminServiceImpl implements AdminService {
             log.error("tourdetail 에러 :",e);
             throw new RuntimeException(e);
         }
-        //Object cacheKey = CACHE_PREFIX + vo ;
-
     }
 
     // 여행지 삭제
@@ -152,13 +167,24 @@ public class AdminServiceImpl implements AdminService {
     return userlist;
     }
 
-    // 후기 게시판 리스트 출력
+
+    /**
+     * 후기 게시판 리스트 출력
+     * redis O =  3ms or 4ms
+     * redis X = 12ms
+     */
     public List<AdminTouroViewList> touroviewList() {
-    List<AdminTouroViewList> viewList = adminDAO.touroviewList();
-    return viewList;
+        String cacheKey = CACHE_PREFIX ;
+        if(cacheKey == null){
+            List<AdminTouroViewList> viewList = adminDAO.touroviewList();
+            String newcacheKey = CACHE_PREFIX + viewList ;
+            redisTemplate.opsForValue().set(newcacheKey,viewList,10, TimeUnit.MINUTES);
+            return viewList;
+        }
+        List<AdminTouroViewList> cacheData = (List<AdminTouroViewList>) redisTemplate.opsForValue().get(cacheKey);
+        return cacheData ;
+
     }
-
-
 
     // 여행지 이미지 제외 수정
     public int modifyTour(AdminVO vo){
