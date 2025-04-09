@@ -15,7 +15,7 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory("localhost", 6379);  // 호스트와 포트 직접 설정
+        return new LettuceConnectionFactory("localhost", 6379);
     }
 
     @Bean

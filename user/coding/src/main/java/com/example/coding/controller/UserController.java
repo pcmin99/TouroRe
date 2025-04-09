@@ -165,12 +165,11 @@ public class UserController {
 
     // 비밀번호 찾기 - 인증메일발송
 	@RequestMapping(value = "/find-pw", method = RequestMethod.POST)
-	public ModelAndView forgotPassword(HttpSession session, 
+	public ModelAndView forgotPassword(HttpSession session,
 			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String user_email = (String)request.getParameter("user_email");
 		String user_id = (String)request.getParameter("user_id");
 		UserVO vo = userService.selectUser(user_email,user_id);
-		System.out.println("====사용자정보 확인 성공==="+vo);
 
 		if(vo != null) {
 		Random r = new Random();

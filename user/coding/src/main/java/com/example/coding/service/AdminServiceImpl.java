@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.example.coding.dao.AdminDAO;
@@ -28,10 +29,6 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private AdminDAO adminDAO;
 
-
-
-
-
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -39,6 +36,9 @@ public class AdminServiceImpl implements AdminService {
     private ObjectMapper objectMapper ;
 
     private static final String CACHE_PREFIX =  System.getenv("redis_prefix");
+
+
+
 
     /**
      * redis O = 4ms
@@ -126,6 +126,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // 여행지 삭제
+    @Async
     public int deleteNum(AdminVO vo) {
         int result = adminDAO.deleteNum(vo);
         return result;
@@ -145,13 +146,11 @@ public class AdminServiceImpl implements AdminService {
             vo.setTour_img1_path("tourimg\\" + img_real_name);
         } catch (Exception e) {
             log.error("에러:",e);
-            e.printStackTrace();
         }
 
         return adminDAO.tourInsert(vo); // try에 해당 return 값을 넣을꺼면 catch 부분도 return 값이 있어야 하는데 고민중 25.03 --------------------------------------------------
 
     }
-
 
     // 유저 리스트 출력
     // ADMINCONTROLLER.userList => 로직 이동
