@@ -115,25 +115,13 @@ public class UserController {
 		int result = userService.idCheck(user_id);
 		return "" + result;
 	}
-
+	
+	// 로그인ㄴ
     @RequestMapping("/loginCheck")
     public String loginCheck(UserVO vo, HttpSession s){
-        
-        // DB에서 사용자 정보 대조
-        vo = userService.loginCheck(vo);
-        System.out.println("login() 호출 =====> vo: "+vo);
-
-        // 사용자 정보 확인 시 (로그인 성공 시)
+        vo = userService.loginCheck(vo,s);
         if( vo != null ){
-            // 사용자 정보를 세션에 저장
-            s.setAttribute("loggedInUser", vo);
-            // 아이디 세션이 필요해서 추가합니다 - 이지연
-            s.setAttribute("loggedId", vo.getUser_id());
-			// 이름 세션이 필요해서 추가합니다 - 이지연
-            s.setAttribute("loggedInName", vo.getUser_name());
-            // 사용자 정보 중 관리자 권한 여부 확인
             int role = vo.getAdmin_authority();
-            // 관리자 권한 여부가 1이면 사용자 페이지(메인페이지)로 이동
             if( role == 1 ){
                 return "redirect:/touro";
             }else if( role == 0 ){

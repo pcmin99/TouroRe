@@ -1,19 +1,15 @@
 package com.example.coding.service;
 
 import java.io.File;
-import java.sql.Time;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.example.coding.domain.*;
 import com.example.coding.util.MD5Generator;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.example.coding.dao.AdminDAO;
@@ -68,6 +64,7 @@ public class AdminServiceImpl implements AdminService {
             throw new RuntimeException(e);
         }
     }
+
 
     /**
      * 기본 캐쉬 키가 null일 경우 
@@ -126,7 +123,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // 여행지 삭제
-    @Async
     public int deleteNum(AdminVO vo) {
         int result = adminDAO.deleteNum(vo);
         return result;
@@ -147,9 +143,7 @@ public class AdminServiceImpl implements AdminService {
         } catch (Exception e) {
             log.error("에러:",e);
         }
-
         return adminDAO.tourInsert(vo); // try에 해당 return 값을 넣을꺼면 catch 부분도 return 값이 있어야 하는데 고민중 25.03 --------------------------------------------------
-
     }
 
     // 유저 리스트 출력

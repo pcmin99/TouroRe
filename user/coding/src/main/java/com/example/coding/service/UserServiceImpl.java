@@ -1,9 +1,13 @@
 package com.example.coding.service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +18,7 @@ import com.example.coding.domain.ImgDetailVO;
 import com.example.coding.domain.ImgVO;
 import com.example.coding.domain.UserVO;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -25,6 +30,8 @@ public class UserServiceImpl implements UserService {
 
 	private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+	@Autowired
+	private RedissonClient redissonClient ;
 
 	@Transactional
 	public void insertUser(UserVO vo, ImgVO ivo, ImgDetailVO idvo) {
@@ -55,26 +62,32 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public UserVO loginCheck(UserVO vo) {
-		// 사용자 아이디를 이용하여 DB에서 저장된 암호화된 비밀번호 가져오기
-		UserVO user = userDAO.passCheck(vo);
-
-		if (user != null) {
-			// 데이터베이스에 저장된 암호화된 비밀번호
+	public UserVO loginCheck(UserVO vo, HttpSession s) {
+		String userId = vo.getUser_id() ;
+		RLock lock = redissonClient.getLock("loginLock:" + userId);
+		try{
+			if(!lock.tryLock(2,5, TimeUnit.SECONDS)){
+				return null ;
+			}
+			UserVO user = userDAO.passCheck(vo);
+			if(user == null){return  null; }
 			String bcryptPassword = user.getUser_pass();
-			
-			// 사용자가 입력한 비밀번호
 			String inputPassword = vo.getUser_pass();
-
-			// BCryptPasswordEncoder.matches()를 사용하여 비밀번호 대조
-			if (passwordEncoder.matches(inputPassword, bcryptPassword)) {
-				// 비밀번호가 일치하면 사용자 정보 반환
-				return user;
+			if (!passwordEncoder.matches(inputPassword, bcryptPassword)) {
+				return null ;
+			}
+			s.setAttribute("loggedInUser", user);
+			s.setAttribute("loggedId", user.getUser_id());
+			s.setAttribute("loggedInName", user.getUser_name());
+			return user ;
+		} catch (Exception e) {
+			log.error("loginCheck ERROR :" ,e);
+			throw new RuntimeException(e);
+		}finally {
+			if (lock.isHeldByCurrentThread()) {
+				lock.unlock();
 			}
 		}
-	
-		// 사용자 정보가 없거나 비밀번호가 일치하지 않으면 null 반환
-		return null;
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.example.coding.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class GlobalExceptionHandler  {
     @ExceptionHandler(Exception.class)
     public String handleAllException(Exception ex){
         log.error("handleAllException : ",ex);
-        return "/Touro" ;
+        return "/touro" ;
     }
 
 }

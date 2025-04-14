@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.coding.domain.UserVO;
 import com.example.coding.domain.ImgDetailVO;
 import com.example.coding.domain.ImgVO;
+import jakarta.servlet.http.HttpSession;
 
 public interface UserService {
     // 회원가입
@@ -12,7 +13,7 @@ public interface UserService {
     // ID 중복확인
     public int idCheck(String user_id);
     // 로그인
-    public UserVO loginCheck(UserVO vo);
+    public UserVO loginCheck(UserVO vo, HttpSession s);
     // 소셜 로그인
     public UserVO socialLoginCheck(String user_id);
     // 아이디 찾기
